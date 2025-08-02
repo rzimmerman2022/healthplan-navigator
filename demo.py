@@ -94,10 +94,10 @@ def main():
     # Parse documents
     print("\nParsing healthcare plan documents...")
     parser = DocumentParser()
-    current_dir = Path(__file__).parent
+    documents_dir = Path(__file__).parent / "personal_documents"
     
-    # Parse all PDF and DOCX files in the current directory
-    plans = parser.parse_batch(str(current_dir))
+    # Parse all PDF and DOCX files in the personal_documents directory
+    plans = parser.parse_batch(str(documents_dir))
     
     if not plans:
         print("❌ No plans were parsed. Make sure you have PDF/DOCX files in the directory.")

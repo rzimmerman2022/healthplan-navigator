@@ -122,17 +122,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Analyze plans in current directory with sample client
-  python -m healthplan_navigator.cli --sample-client --plans-dir .
+  # Analyze plans in personal_documents directory with sample client
+  python -m healthplan_navigator.cli --sample-client --plans-dir ./personal_documents
 
   # Use custom client data and specific plan files
-  python -m healthplan_navigator.cli --client client.json --plans plan1.pdf plan2.pdf
+  python -m healthplan_navigator.cli --client client.json --plans ./personal_documents/plan1.pdf ./personal_documents/plan2.pdf
 
   # Batch processing with custom output directory
-  python -m healthplan_navigator.cli --client client.json --plans-dir ./plans --output ./results
+  python -m healthplan_navigator.cli --client client.json --plans-dir ./personal_documents --output ./results
 
   # Generate all report formats
-  python -m healthplan_navigator.cli --sample-client --plans-dir . --format all
+  python -m healthplan_navigator.cli --sample-client --plans-dir ./personal_documents --format all
         """
     )
     

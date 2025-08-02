@@ -1,11 +1,9 @@
 # Personal Healthcare Documents
+personal_documents/
 *.pdf
 *.PDF
 *.docx
 *.DOCX
-Binder1.pdf
-HealthGov_*.pdf
-HealthGov_*.docx
 
 # Python
 __pycache__/

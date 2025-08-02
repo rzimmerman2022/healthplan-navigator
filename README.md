@@ -23,23 +23,25 @@ Each metric is scored 0-10, then weighted to create an overall ranking that help
 # Install dependencies
 pip install -r requirements.txt
 
+# Place your healthcare plan documents in the personal_documents folder
+
 # Run the demo with your actual plan documents
 python demo.py
 ```
 
-This will analyze all PDF and DOCX files in your directory and generate comprehensive reports.
+This will analyze all PDF and DOCX files in the `personal_documents` directory and generate comprehensive reports.
 
 ### Option 2: Use the CLI
 
 ```bash
 # With sample client data
-python -m healthplan_navigator.cli --sample-client --plans-dir .
+python -m healthplan_navigator.cli --sample-client --plans-dir ./personal_documents
 
 # With your own client data
-python -m healthplan_navigator.cli --client sample_client.json --plans-dir .
+python -m healthplan_navigator.cli --client sample_client.json --plans-dir ./personal_documents
 
 # Analyze specific plan files
-python -m healthplan_navigator.cli --sample-client --plans plan1.pdf plan2.pdf
+python -m healthplan_navigator.cli --sample-client --plans ./personal_documents/plan1.pdf ./personal_documents/plan2.pdf
 ```
 
 ## 📊 Output Formats
@@ -74,7 +76,7 @@ The system can analyze these document types from Healthcare.gov:
 - **JSON Files**: Structured plan data
 - **CSV Files**: Batch plan information
 
-Your current directory contains real Healthcare.gov plan documents that will be automatically analyzed.
+Place your Healthcare.gov plan documents in the `personal_documents` folder for analysis. This folder is excluded from version control to protect your privacy.
 
 ## 🎯 Scoring System Details
 
