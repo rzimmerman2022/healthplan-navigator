@@ -1,0 +1,80 @@
+{
+  "client": {
+    "personal": {
+      "full_name": "Ryan Healthcare",
+      "dob": "1985-06-15",
+      "zipcode": "85001",
+      "household_size": 2,
+      "annual_income": 75000,
+      "csr_eligible": false
+    },
+    "medical_profile": {
+      "providers": [
+        {
+          "name": "Dr. Sarah Chen",
+          "specialty": "Primary Care",
+          "priority": "must-keep",
+          "visit_frequency": 2
+        },
+        {
+          "name": "Dr. Michael Anderson",
+          "specialty": "Cardiology",
+          "priority": "must-keep",
+          "visit_frequency": 3
+        },
+        {
+          "name": "Dr. Lisa Rodriguez",
+          "specialty": "Dermatology",
+          "priority": "nice-to-keep",
+          "visit_frequency": 1
+        }
+      ],
+      "medications": [
+        {
+          "name": "Metformin",
+          "dosage": "500mg",
+          "frequency": "Daily",
+          "annual_doses": 365,
+          "manufacturer_program": {
+            "exists": false
+          }
+        },
+        {
+          "name": "Tremfya",
+          "dosage": "100mg",
+          "frequency": "Every 8 weeks",
+          "annual_doses": 6,
+          "manufacturer_program": {
+            "exists": true,
+            "type": "copay-card",
+            "max_benefit": 20000,
+            "expected_copay": 5
+          }
+        },
+        {
+          "name": "Lisinopril",
+          "dosage": "10mg",
+          "frequency": "Daily",
+          "annual_doses": 365,
+          "manufacturer_program": {
+            "exists": false
+          }
+        }
+      ],
+      "special_treatments": [
+        {
+          "name": "Medical Botox",
+          "frequency": 4,
+          "allowed_cost": 2000
+        }
+      ]
+    },
+    "priorities": {
+      "keep_providers": 5,
+      "minimize_total_cost": 4,
+      "predictable_costs": 3,
+      "avoid_prior_auth": 4,
+      "simple_admin": 3
+    }
+  }
+}
