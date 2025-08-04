@@ -81,13 +81,13 @@ def create_ryan_client() -> Client:
 
 def main():
     """Run the complete analysis on your healthcare documents."""
-    print("🏥 HealthPlan Navigator Demo")
+    print("HealthPlan Navigator Demo")
     print("=" * 50)
     
     # Create client profile
     print("Creating client profile...")
     client = create_ryan_client()
-    print(f"✅ Client: {client.personal.full_name}")
+    print(f"Client: {client.personal.full_name}")
     print(f"   Providers: {len(client.medical_profile.providers)}")
     print(f"   Medications: {len(client.medical_profile.medications)}")
     
@@ -103,7 +103,7 @@ def main():
         print("❌ No plans were parsed. Make sure you have PDF/DOCX files in the directory.")
         return
     
-    print(f"✅ Successfully parsed {len(plans)} plans:")
+    print(f"Successfully parsed {len(plans)} plans:")
     for i, plan in enumerate(plans[:5], 1):  # Show first 5
         print(f"   {i}. {plan.marketing_name} ({plan.issuer}) - ${plan.monthly_premium:.2f}/month")
     if len(plans) > 5:
@@ -114,12 +114,12 @@ def main():
     engine = AnalysisEngine()
     report = engine.analyze_plans(client, plans)
     
-    print("✅ Analysis complete!")
+    print("Analysis complete!")
     
     # Show top 3 recommendations
-    print("\n🥇 TOP 3 RECOMMENDATIONS:")
+    print("\nTOP 3 RECOMMENDATIONS:")
     for i, rec in enumerate(report.top_recommendations[:3], 1):
-        medal = ["🥇", "🥈", "🥉"][i-1]
+        medal = ["1st", "2nd", "3rd"][i-1]
         print(f"\n{medal} {rec.plan.marketing_name}")
         print(f"   Overall Score: {rec.metrics.weighted_total_score:.1f}/10")
         print(f"   Monthly Premium: ${rec.plan.monthly_premium:.2f}")
@@ -142,14 +142,14 @@ def main():
     json_file = report_gen.generate_json_export(report)
     html_file = report_gen.generate_html_dashboard(report)
     
-    print("\n📊 GENERATED REPORTS:")
-    print(f"   📄 Executive Summary: {summary_file}")
-    print(f"   📊 Scoring Matrix (CSV): {csv_file}")
-    print(f"   💾 Data Export (JSON): {json_file}")
-    print(f"   🌐 Interactive Dashboard: {html_file}")
+    print("\nGENERATED REPORTS:")
+    print(f"   - Executive Summary: {summary_file}")
+    print(f"   - Scoring Matrix (CSV): {csv_file}")
+    print(f"   - Data Export (JSON): {json_file}")
+    print(f"   - Interactive Dashboard: {html_file}")
     
     # Show scoring matrix preview
-    print("\n📋 SCORING MATRIX PREVIEW:")
+    print("\nSCORING MATRIX PREVIEW:")
     print("-" * 100)
     print(f"{'Rank':<4} {'Plan Name':<30} {'Score':<8} {'Provider':<8} {'Medication':<10} {'Cost':<6} {'Annual Cost':<12}")
     print("-" * 100)
@@ -163,11 +163,11 @@ def main():
               f"${analysis.estimated_annual_cost:>10,.0f}")
     
     print("-" * 100)
-    print(f"\n🎯 RECOMMENDATION: Choose {report.top_recommendations[0].plan.marketing_name}")
+    print(f"\nRECOMMENDATION: Choose {report.top_recommendations[0].plan.marketing_name}")
     print(f"   This plan scored {report.top_recommendations[0].metrics.weighted_total_score:.1f}/10 overall")
     print(f"   Best balance of provider access, medication coverage, and cost")
     
-    print(f"\n✅ Demo complete! Check the './reports' directory for detailed analysis files.")
+    print(f"\nDemo complete! Check the './reports' directory for detailed analysis files.")
 
 
 if __name__ == '__main__':

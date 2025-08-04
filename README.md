@@ -90,7 +90,7 @@ Each metric is scored 0-10 and weighted for overall ranking:
 ```bash
 # Clone the repository
 git clone https://github.com/rzimmerman2022/healthplan-navigator.git
-cd "healthgov resaerch projec t"
+cd "healthgov-research-project"
 
 # Install dependencies
 pip install -r requirements.txt
@@ -114,7 +114,7 @@ python demo.py
 
 ### Directory Structure
 ```
-healthgov resaerch projec t/
+healthgov-research-project/
 ├── healthplan_navigator/         # Main package
 │   ├── __init__.py              # Package initialization
 │   ├── core/                    # Core functionality
@@ -313,23 +313,54 @@ Based on objective quality measures.
 
 ### Detailed Installation
 
+### System Requirements
+
+#### Minimum Requirements
+- **Python**: 3.8 or higher (3.11+ recommended)
+- **RAM**: 4GB minimum, 8GB recommended for large document sets
+- **Storage**: 500MB for installation, additional space for documents and reports
+- **OS**: Windows 10+, macOS 10.14+, Linux (Ubuntu 18.04+, CentOS 7+)
+
+#### Recommended Development Environment
+- **Python**: 3.11+ for best performance and typing support
+- **RAM**: 16GB for development and testing
+- **Storage**: 2GB free space
+- **IDE**: VS Code with Python extension, PyCharm, or similar
+
 #### 1. Install Python
 ```bash
-# Check if Python is installed
+# Check if Python is installed (must be 3.8+)
 python --version
+python3 --version  # On systems with both Python 2 and 3
 
-# If not installed, download from python.org
-# Or use package manager:
-# macOS: brew install python3
-# Ubuntu: sudo apt-get install python3
-# Windows: Download installer from python.org
+# Install Python if needed:
+# Windows: Download from python.org (select "Add to PATH")
+# macOS: brew install python@3.11 or download from python.org
+# Ubuntu/Debian: sudo apt update && sudo apt install python3.11 python3.11-venv
+# CentOS/RHEL: sudo yum install python3.11 python3.11-venv
+# Or use pyenv for version management: pyenv install 3.11.7
+```
+
+#### System-Specific Setup
+```bash
+# Windows additional setup
+# Install Microsoft Visual C++ Build Tools if compilation errors occur
+# Download from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+# macOS additional setup
+# Install Xcode command line tools if needed
+xcode-select --install
+
+# Linux additional dependencies
+sudo apt-get install python3-dev python3-pip libpoppler-cpp-dev  # Ubuntu/Debian
+sudo yum install python3-devel python3-pip poppler-cpp-devel     # CentOS/RHEL
 ```
 
 #### 2. Clone Repository
 ```bash
 # Using Git
 git clone https://github.com/rzimmerman2022/healthplan-navigator.git
-cd "healthgov resaerch projec t"
+cd "healthgov-research-project"
 
 # Or download ZIP from GitHub and extract
 ```
@@ -713,11 +744,341 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
+### System Requirements Issues
+
+#### 5. Python Version Compatibility
+**Problem**: "Syntax errors or import failures"
+```bash
+# Check Python version (requires 3.8+)
+python --version
+
+# Upgrade Python if needed
+# Windows: Download from python.org
+# macOS: brew install python@3.11
+# Linux: sudo apt update && sudo apt install python3.11
+```
+
+#### 6. Dependency Conflicts
+**Problem**: "Package version conflicts"
+```bash
+# Create fresh virtual environment
+python -m venv clean_env
+source clean_env/bin/activate  # Linux/macOS
+# clean_env\Scripts\activate   # Windows
+
+# Install from clean slate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+#### 7. File Permission Errors
+**Problem**: "Permission denied accessing documents"
+```bash
+# Windows: Run as administrator or check folder permissions
+# Linux/macOS: Check file ownership
+chmod 755 personal_documents/
+chmod 644 personal_documents/*.pdf
+```
+
+### Performance Optimization
+
+#### Large Document Sets
+```python
+# Process plans in batches to manage memory
+from healthplan_navigator.analysis.engine import HealthPlanAnalyzer
+
+analyzer = HealthPlanAnalyzer(client)
+batch_size = 5
+
+for i in range(0, len(plan_files), batch_size):
+    batch = plan_files[i:i+batch_size]
+    for plan_file in batch:
+        analyzer.add_plan_from_file(plan_file)
+    
+    # Process batch and clear memory
+    results = analyzer.analyze()
+    analyzer.clear_plans()  # Clear loaded plans
+```
+
+#### Caching Results
+```python
+# Enable result caching for repeated analyses
+import pickle
+
+# Save analysis results
+with open('analysis_cache.pkl', 'wb') as f:
+    pickle.dump(results, f)
+
+# Load cached results
+with open('analysis_cache.pkl', 'rb') as f:
+    cached_results = pickle.load(f)
+```
+
+### Security Considerations
+
+#### Document Privacy
+- All processing happens locally - no data sent to external servers
+- Documents in `personal_documents/` are gitignored by default
+- Clear temporary files after analysis:
+```bash
+# Clean up temporary files
+rm -rf /tmp/healthplan_*  # Linux/macOS
+del /temp/healthplan_*    # Windows
+```
+
+#### Sensitive Information Handling
+```python
+# Scrub sensitive data from reports
+from healthplan_navigator.core.models import Client
+
+# Use pseudonyms in client profiles for demos
+client = Client(
+    personal=PersonalInfo(
+        full_name="Sample User",  # Don't use real names in examples
+        birth_date="1990-01-01"   # Use generic dates
+    )
+)
+```
+
 ### Getting Help
-1. Check existing issues: https://github.com/rzimmerman2022/healthplan-navigator/issues
-2. Review documentation in `docs/` folder
-3. Enable debug mode for detailed logs
-4. Create minimal reproducible example
+1. **Check System Requirements**: Python 3.8+, 4GB RAM minimum
+2. **Review Documentation**: Start with `docs/API.md` for detailed API reference
+3. **Search Existing Issues**: https://github.com/rzimmerman2022/healthplan-navigator/issues
+4. **Enable Debug Mode**: Set `HEALTHPLAN_LOG_LEVEL=DEBUG` for detailed logs
+5. **Create Minimal Example**: Isolate the issue with smallest reproducible case
+6. **Check File Formats**: Ensure documents are searchable PDFs, not scanned images
+7. **Verify Dependencies**: Run `pip check` to identify package conflicts
+
+## 📋 Best Practices
+
+### Document Preparation
+
+#### Optimal Document Formats
+```bash
+# Best: Native PDF with searchable text
+✅ plan_summary.pdf (created digitally)
+
+# Good: DOCX files from insurance companies  
+✅ benefits_overview.docx
+
+# Acceptable: Clean scanned PDFs with OCR
+⚠️  scanned_plan.pdf (run through OCR first)
+
+# Avoid: Image-only documents
+❌ plan_photo.jpg, plan_screenshot.png
+```
+
+#### File Naming Conventions
+```bash
+# Recommended naming pattern:
+[Year]_[Tier]_[Insurer]_[PlanType]_[DocumentType].pdf
+
+# Examples:
+2025_Gold_BlueCross_HMO_Summary.pdf
+2025_Silver_Aetna_PPO_Benefits.pdf
+2025_Bronze_UnitedHealth_EPO_Formulary.pdf
+```
+
+### Client Profile Optimization
+
+#### Complete Healthcare Information
+```json
+{
+  "client": {
+    "personal": {
+      "full_name": "John Doe",
+      "birth_date": "1985-03-15",
+      "zip_code": "90210"  // Critical for network accuracy
+    },
+    "medical_profile": {
+      "providers": [
+        {
+          "name": "Dr. Sarah Chen, MD",  // Include full credentials
+          "specialty": "Internal Medicine",
+          "is_primary": true,
+          "visits_per_year": 4  // Include usage patterns
+        }
+      ],
+      "medications": [
+        {
+          "name": "Metformin",  // Use generic names when possible
+          "dosage": "500mg",
+          "frequency": "twice daily",
+          "is_brand_required": false  // Important for cost calculations
+        }
+      ],
+      "conditions": [
+        "Type 2 Diabetes",  // Use standard medical terminology
+        "Hypertension"
+      ]
+    }
+  }
+}
+```
+
+### Analysis Workflow
+
+#### Step-by-Step Process
+```bash
+# 1. Prepare environment
+python -m venv healthplan_env
+source healthplan_env/bin/activate  # Linux/macOS
+# healthplan_env\Scripts\activate   # Windows
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Organize documents
+mkdir -p personal_documents/2025_plans
+cp *.pdf personal_documents/2025_plans/
+
+# 4. Create client profile
+cp sample_client.json my_profile.json
+# Edit my_profile.json with your information
+
+# 5. Run analysis
+python demo.py
+
+# 6. Review results
+ls reports/  # Check generated files
+open reports/dashboard_*.html  # View interactive dashboard
+```
+
+#### Quality Validation
+```python
+# Validate your analysis results
+from healthplan_navigator.analysis.engine import HealthPlanAnalyzer
+
+# Check for common issues
+def validate_analysis(results):
+    issues = []
+    
+    for plan in results.plan_analyses:
+        # Flag plans with no provider data
+        if plan.metrics.provider_network_score == 0:
+            issues.append(f"No provider data found for {plan.plan.marketing_name}")
+        
+        # Flag unrealistic costs
+        if plan.estimated_annual_cost < 1000:
+            issues.append(f"Suspiciously low cost for {plan.plan.marketing_name}")
+    
+    return issues
+```
+
+### Performance Optimization
+
+#### Memory Management
+```python
+# For large document sets (20+ plans)
+import gc
+
+analyzer = HealthPlanAnalyzer(client)
+batch_size = 10
+
+for i in range(0, len(plan_files), batch_size):
+    batch = plan_files[i:i+batch_size]
+    
+    # Process batch
+    for plan_file in batch:
+        analyzer.add_plan_from_file(plan_file)
+    
+    results = analyzer.analyze()
+    
+    # Save batch results and clean memory
+    results.save(f'batch_{i//batch_size}_results.json')
+    analyzer.clear_plans()
+    gc.collect()  # Force garbage collection
+```
+
+#### Parallel Processing
+```python
+# Process multiple client profiles simultaneously
+from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
+
+def analyze_client_profile(profile_path):
+    """Analyze single client profile"""
+    # Implementation here
+    pass
+
+# Run multiple analyses in parallel
+profile_files = list(Path('client_profiles/').glob('*.json'))
+
+with ProcessPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(analyze_client_profile, profile_files))
+```
+
+### Security and Privacy
+
+#### Data Protection Checklist
+- [ ] **Local Processing**: Verify no data sent to external APIs
+- [ ] **Document Cleanup**: Remove temporary files after analysis
+- [ ] **Secure Storage**: Encrypt sensitive documents at rest
+- [ ] **Access Control**: Limit file permissions appropriately
+- [ ] **Audit Trail**: Log analysis activities for compliance
+
+#### Privacy-First Configuration
+```python
+# Configure for maximum privacy
+import tempfile
+import os
+
+# Use secure temporary directory
+with tempfile.TemporaryDirectory(prefix='healthplan_secure_') as temp_dir:
+    analyzer = HealthPlanAnalyzer(
+        client=client,
+        temp_dir=temp_dir,
+        enable_logging=False,  # Disable detailed logs
+        clear_cache=True       # Clear all cached data
+    )
+    
+    results = analyzer.analyze()
+    
+    # Temporary directory automatically cleaned up
+```
+
+### Reporting and Output
+
+#### Professional Report Generation
+```python
+# Customize report output for different audiences
+from healthplan_navigator.output.report import ReportGenerator
+
+# Executive summary for decision makers
+exec_report = ReportGenerator(
+    format_style='executive',
+    include_technical_details=False,
+    highlight_top_3_only=True
+)
+
+# Detailed analysis for benefits administrators
+detailed_report = ReportGenerator(
+    format_style='comprehensive',
+    include_technical_details=True,
+    include_raw_scores=True,
+    add_methodology_appendix=True
+)
+```
+
+#### Multi-Format Output Strategy
+```bash
+# Generate all report formats for comprehensive documentation
+python -c "
+from healthplan_navigator.analysis.engine import HealthPlanAnalyzer
+from healthplan_navigator.output.report import ReportGenerator
+
+# Run analysis
+analyzer = HealthPlanAnalyzer(client)
+results = analyzer.analyze()
+
+# Generate all formats
+gen = ReportGenerator('./reports')
+gen.generate_executive_summary(results)     # For executives
+gen.generate_scoring_matrix_csv(results)    # For data analysis
+gen.generate_json_export(results)           # For API integration
+gen.generate_html_dashboard(results)        # For interactive review
+"
+```
 
 ## 🤝 Contributing
 
@@ -734,7 +1095,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ```bash
 # Fork and clone repository
 git clone https://github.com/YOUR_USERNAME/healthplan-navigator.git
-cd "healthgov resaerch projec t"
+cd "healthgov-research-project"
 
 # Install development dependencies
 pip install -r requirements-dev.txt
