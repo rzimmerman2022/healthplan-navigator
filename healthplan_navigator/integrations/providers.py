@@ -6,8 +6,10 @@ Handles provider network data from various sources.
 
 import json
 import logging
-from typing import List, Dict, Optional, Set
+import os
+from typing import List, Dict, Optional, Set, Any
 from pathlib import Path
+import requests
 from fuzzywuzzy import fuzz
 
 from ..core.models import Provider, ProviderNetwork, Priority
@@ -26,16 +28,23 @@ class ProviderNetworkIntegration:
     - Local provider database caching
     """
     
-    def __init__(self, cache_dir: str = "./cache/providers"):
+    # NPPES API endpoint (public, no auth required)
+    NPPES_API_URL = "https://npiregistry.cms.hhs.gov/api/"
+    NPPES_SEARCH_ENDPOINT = "?version=2.1"
+    
+    def __init__(self, cache_dir: str = "./cache/providers", nppes_api_key: Optional[str] = None):
         """
         Initialize provider network integration.
         
         Args:
             cache_dir: Directory for caching provider data
+            nppes_api_key: Optional API key for enhanced NPPES access
         """
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.provider_cache = {}
+        self.nppes_api_key = nppes_api_key or os.getenv('NPPES_API_KEY')
+        self.session = requests.Session()
         self._load_provider_cache()
     
     def check_provider_in_network(self, 
@@ -145,17 +154,79 @@ class ProviderNetworkIntegration:
         Returns:
             List of provider dictionaries
         """
-        # TODO: Implement provider search
-        # This would integrate with NPPES or other provider databases
-        
         results = []
         
-        # Search in cache for now
+        # Try NPPES API first
+        try:
+            nppes_results = self._search_nppes(specialty, location)
+            if nppes_results:
+                results.extend(nppes_results)
+        except Exception as e:
+            logger.debug(f"NPPES search error: {e}")
+        
+        # Search in cache as fallback
         for provider_id, provider_data in self.provider_cache.items():
             if specialty and specialty.lower() in provider_data.get('specialty', '').lower():
                 results.append(provider_data)
         
         return results[:50]  # Limit results
+    
+    def _search_nppes(self, specialty: Optional[str], location: Optional[str]) -> List[Dict]:
+        """
+        Search NPPES registry for providers.
+        
+        Args:
+            specialty: Medical specialty
+            location: ZIP code or city/state
+        
+        Returns:
+            List of provider data from NPPES
+        """
+        params = {
+            'enumeration_type': '1',  # Individual providers
+            'limit': 25
+        }
+        
+        if specialty:
+            params['taxonomy_description'] = specialty
+        
+        if location:
+            if location.isdigit() and len(location) == 5:
+                params['postal_code'] = location
+            else:
+                params['city'] = location
+        
+        try:
+            response = self.session.get(
+                self.NPPES_API_URL + self.NPPES_SEARCH_ENDPOINT,
+                params=params,
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                providers = []
+                
+                for result in data.get('results', []):
+                    provider = {
+                        'npi': result.get('number'),
+                        'name': f"{result.get('basic', {}).get('first_name', '')} {result.get('basic', {}).get('last_name', '')}".strip(),
+                        'specialty': result.get('taxonomies', [{}])[0].get('desc', '') if result.get('taxonomies') else '',
+                        'address': result.get('addresses', [{}])[0] if result.get('addresses') else {},
+                        'phone': result.get('addresses', [{}])[0].get('telephone_number', '') if result.get('addresses') else ''
+                    }
+                    providers.append(provider)
+                    
+                    # Cache the provider
+                    self.provider_cache[provider['npi']] = provider
+                
+                self._save_provider_cache()
+                return providers
+                
+        except Exception as e:
+            logger.error(f"NPPES API error: {e}")
+        
+        return []
     
     def _load_provider_cache(self):
         """Load provider cache from disk."""

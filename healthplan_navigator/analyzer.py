@@ -7,11 +7,17 @@ Provides a single interface for the complete analysis pipeline.
 from pathlib import Path
 from typing import List, Optional, Union, Dict, Any
 import json
+import logging
 
 from .core.models import Client, Plan, AnalysisReport
 from .core.ingest import DocumentParser
 from .analysis.engine import AnalysisEngine
 from .output.report import ReportGenerator
+from .integrations.healthcare_gov import HealthcareGovAPI
+from .integrations.providers import ProviderNetworkIntegration
+from .integrations.medications import MedicationIntegration
+
+logger = logging.getLogger(__name__)
 
 
 class HealthPlanAnalyzer:
@@ -55,8 +61,14 @@ class HealthPlanAnalyzer:
         Returns:
             AnalysisReport with all scored and ranked plans
         """
+        # Store client reference for location-based fetching
+        self._current_client = client
+        
         # Load plans
         plans = self._load_plans(plan_sources, healthcare_gov_fetch)
+        
+        # Clean up client reference
+        self._current_client = None
         
         if not plans:
             raise ValueError("No plans available for analysis")

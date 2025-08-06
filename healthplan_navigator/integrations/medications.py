@@ -6,9 +6,11 @@ Handles drug formulary data and pricing information.
 
 import json
 import logging
+import os
 from typing import List, Dict, Optional, Tuple
 from pathlib import Path
 from datetime import datetime
+import requests
 
 from ..core.models import Medication, DrugFormulary
 
@@ -26,17 +28,26 @@ class MedicationIntegration:
     - Generic/brand name mapping
     """
     
-    def __init__(self, cache_dir: str = "./cache/medications"):
+    # RxNorm API (public, no auth required)
+    RXNORM_API_URL = "https://rxnav.nlm.nih.gov/REST/"
+    
+    # OpenFDA API for drug information (public)
+    OPENFDA_API_URL = "https://api.fda.gov/drug/"
+    
+    def __init__(self, cache_dir: str = "./cache/medications", goodrx_api_key: Optional[str] = None):
         """
         Initialize medication integration.
         
         Args:
             cache_dir: Directory for caching medication data
+            goodrx_api_key: Optional GoodRx API key for pricing
         """
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.drug_cache = {}
         self.price_cache = {}
+        self.goodrx_api_key = goodrx_api_key or os.getenv('GOODRX_API_KEY')
+        self.session = requests.Session()
         self._load_drug_cache()
     
     def check_medication_coverage(self, 
@@ -290,9 +301,17 @@ class MedicationIntegration:
         Returns:
             List of generic alternatives
         """
-        # TODO: Implement RxNorm lookup for generic alternatives
+        alternatives = []
         
-        # Simplified mapping for common brand -> generic
+        # Try RxNorm API first
+        try:
+            rxnorm_alternatives = self._find_rxnorm_alternatives(medication.name)
+            if rxnorm_alternatives:
+                return rxnorm_alternatives
+        except Exception as e:
+            logger.debug(f"RxNorm lookup error: {e}")
+        
+        # Fallback to simplified mapping for common brand -> generic
         brand_to_generic = {
             'lipitor': 'atorvastatin',
             'crestor': 'rosuvastatin',
@@ -314,6 +333,57 @@ class MedicationIntegration:
                 'brand_name': medication.name,
                 'potential_savings': 'Up to 80% lower cost'
             }]
+        
+        return []
+    
+    def _find_rxnorm_alternatives(self, drug_name: str) -> List[Dict[str, str]]:
+        """
+        Find alternatives using RxNorm API.
+        
+        Args:
+            drug_name: Name of medication
+        
+        Returns:
+            List of alternative medications
+        """
+        try:
+            # Get RxCUI for the drug
+            response = self.session.get(
+                f"{self.RXNORM_API_URL}rxcui.json",
+                params={'name': drug_name},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                rxcui = data.get('idGroup', {}).get('rxnormId')
+                
+                if rxcui:
+                    # Get related drugs (generics/brands)
+                    related_response = self.session.get(
+                        f"{self.RXNORM_API_URL}rxcui/{rxcui}/related.json",
+                        params={'tty': 'SBD+SCD'},
+                        timeout=10
+                    )
+                    
+                    if related_response.status_code == 200:
+                        related_data = related_response.json()
+                        alternatives = []
+                        
+                        for group in related_data.get('relatedGroup', {}).get('conceptGroup', []):
+                            for concept in group.get('conceptProperties', []):
+                                if concept.get('name') and concept.get('name').lower() != drug_name.lower():
+                                    alternatives.append({
+                                        'generic_name': concept.get('name'),
+                                        'brand_name': drug_name,
+                                        'rxcui': concept.get('rxcui'),
+                                        'potential_savings': 'Variable savings'
+                                    })
+                        
+                        return alternatives[:5]  # Limit to 5 alternatives
+        
+        except Exception as e:
+            logger.error(f"RxNorm API error: {e}")
         
         return []
     
