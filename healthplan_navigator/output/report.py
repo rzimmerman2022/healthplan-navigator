@@ -38,8 +38,8 @@ This plan offers the best balance of provider access, medication coverage, and t
 - **Overall Score**: {top_plan.metrics.weighted_total_score:.1f}/10
 - **Estimated Annual Cost**: ${top_plan.estimated_annual_cost:,.2f}
 - **Monthly Premium**: ${top_plan.plan.monthly_premium:.2f}
-- **Deductible**: ${top_plan.plan.deductible_individual:,.2f}
-- **Out-of-Pocket Maximum**: ${top_plan.plan.oop_max_individual:,.2f}
+- **Deductible**: ${getattr(top_plan.plan, 'deductible', getattr(top_plan.plan, 'deductible_individual', 0)):,.2f}
+- **Out-of-Pocket Maximum**: ${getattr(top_plan.plan, 'oop_max', getattr(top_plan.plan, 'oop_max_individual', 0)):,.2f}
 
 ### Scoring Breakdown
 | Metric | Score | Weight |

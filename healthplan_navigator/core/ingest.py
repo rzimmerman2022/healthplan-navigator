@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 import pdfplumber
 from docx import Document
-from .models import Plan, MetalLevel, CoverageStatus, NetworkStatus, CostSharing, Administrative
+from .models import Plan, MetalLevel, PlanType, CoverageStatus, NetworkStatus, CostSharing, Administrative
 
 
 class DocumentParser:
@@ -28,9 +28,10 @@ class DocumentParser:
         elif path.suffix.lower() == '.docx':
             return self._parse_docx(file_path)
         elif path.suffix.lower() == '.json':
-            return self._parse_json(file_path)
+            return self.parse_json(file_path)
         elif path.suffix.lower() == '.csv':
-            return self._parse_csv(file_path)
+            plans = self.parse_csv(file_path)
+            return plans[0] if plans else None
         else:
             raise ValueError(f"Unsupported file format: {path.suffix}")
     
@@ -76,7 +77,7 @@ class DocumentParser:
             print(f"Error reading DOCX {file_path}: {e}")
             return None
     
-    def _parse_json(self, file_path: str) -> Optional[Plan]:
+    def parse_json(self, file_path: str) -> Optional[Plan]:
         """Parse JSON format plan data."""
         try:
             with open(file_path, 'r') as f:
@@ -88,7 +89,7 @@ class DocumentParser:
             print(f"Error reading JSON {file_path}: {e}")
             return None
     
-    def _parse_csv(self, file_path: str) -> List[Plan]:
+    def parse_csv(self, file_path: str) -> List[Plan]:
         """Parse CSV format plan data."""
         plans = []
         try:
@@ -340,31 +341,53 @@ class DocumentParser:
     
     def _json_to_plan(self, data: Dict[str, Any]) -> Plan:
         """Convert JSON data to Plan object."""
+        # Handle both new and old field names
+        deductible = data.get('deductible', data.get('deductible_individual', 0))
+        oop_max = data.get('oop_max', data.get('oop_max_individual', 0))
+        
         return Plan(
             plan_id=data.get('plan_id', ''),
             issuer=data.get('issuer', ''),
             marketing_name=data.get('marketing_name', ''),
-            metal_level=MetalLevel(data.get('metal_level', 'Silver')),
+            metal_level=self.metal_level_mapping.get(data.get('metal_level', '').lower(), MetalLevel.SILVER),
+            plan_type=PlanType[data.get('plan_type', 'PPO').upper()] if data.get('plan_type') else PlanType.PPO,
             monthly_premium=float(data.get('monthly_premium', 0)),
-            deductible_individual=float(data.get('deductible_individual', 0)),
-            oop_max_individual=float(data.get('oop_max_individual', 0)),
+            deductible=float(deductible),
+            oop_max=float(oop_max),
+            copay_primary=float(data.get('copay_primary', 0)),
+            copay_specialist=float(data.get('copay_specialist', 0)),
+            copay_er=float(data.get('copay_er', 0)),
+            coinsurance=float(data.get('coinsurance', 0.2)),
             requires_referrals=data.get('requires_referrals', False),
             cost_sharing=CostSharing(**data.get('cost_sharing', {})),
-            administrative=Administrative(**data.get('administrative', {}))
+            administrative=Administrative(**data.get('administrative', {})),
+            quality_rating=float(data.get('quality_rating', 0)),
+            customer_rating=float(data.get('customer_rating', 0))
         )
     
     def _csv_row_to_plan(self, row: Dict[str, str]) -> Optional[Plan]:
         """Convert CSV row to Plan object."""
         try:
+            # Handle both new and old field names
+            deductible = row.get('deductible', row.get('deductible_individual', 0))
+            oop_max = row.get('oop_max', row.get('oop_max_individual', 0))
+            
             return Plan(
                 plan_id=row.get('plan_id', ''),
                 issuer=row.get('issuer', ''),
                 marketing_name=row.get('marketing_name', ''),
-                metal_level=MetalLevel(row.get('metal_level', 'Silver')),
+                metal_level=self.metal_level_mapping.get(row.get('metal_level', '').lower(), MetalLevel.SILVER),
+                plan_type=PlanType[row.get('plan_type', 'PPO').upper()] if row.get('plan_type') else PlanType.PPO,
                 monthly_premium=float(row.get('monthly_premium', 0)),
-                deductible_individual=float(row.get('deductible_individual', 0)),
-                oop_max_individual=float(row.get('oop_max_individual', 0)),
-                requires_referrals=row.get('requires_referrals', '').lower() == 'true'
+                deductible=float(deductible),
+                oop_max=float(oop_max),
+                copay_primary=float(row.get('copay_primary', 0)),
+                copay_specialist=float(row.get('copay_specialist', 0)),
+                copay_er=float(row.get('copay_er', 0)),
+                coinsurance=float(row.get('coinsurance', 0.2)),
+                requires_referrals=row.get('requires_referrals', '').lower() == 'true',
+                quality_rating=float(row.get('quality_rating', 0)),
+                customer_rating=float(row.get('customer_rating', 0))
             )
         except Exception as e:
             print(f"Error converting CSV row to plan: {e}")

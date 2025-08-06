@@ -9,6 +9,15 @@ class MetalLevel(Enum):
     SILVER = "Silver"
     GOLD = "Gold"
     PLATINUM = "Platinum"
+    CATASTROPHIC = "Catastrophic"
+
+
+class PlanType(Enum):
+    HMO = "HMO"
+    PPO = "PPO"
+    EPO = "EPO"
+    POS = "POS"
+    HDHP = "HDHP"
 
 
 class CoverageStatus(Enum):
@@ -113,19 +122,54 @@ class Administrative:
 
 
 @dataclass
+class ProviderNetwork:
+    network_id: str
+    name: str
+    providers: List[Dict] = field(default_factory=list)
+    hospitals: List[Dict] = field(default_factory=list)
+    urgent_care_centers: List[Dict] = field(default_factory=list)
+
+
+@dataclass
+class DrugFormulary:
+    formulary_id: str
+    name: str
+    tiers: Dict[str, float] = field(default_factory=dict)
+    covered_drugs: List[Dict] = field(default_factory=list)
+
+
+@dataclass
 class Plan:
     plan_id: str
     issuer: str
     marketing_name: str
     metal_level: MetalLevel
-    monthly_premium: float
-    deductible_individual: float
-    oop_max_individual: float
+    plan_type: PlanType = PlanType.PPO
+    monthly_premium: float = 0.0
+    deductible: float = 0.0  # Individual deductible
+    deductible_individual: Optional[float] = None  # Backwards compatibility
+    oop_max: float = 0.0  # Individual out-of-pocket max
+    oop_max_individual: Optional[float] = None  # Backwards compatibility
+    copay_primary: float = 0.0
+    copay_specialist: float = 0.0
+    copay_er: float = 0.0
+    coinsurance: float = 0.2
     requires_referrals: bool = False
     network: Dict[str, NetworkStatus] = field(default_factory=dict)
     formulary: Dict[str, CoverageStatus] = field(default_factory=dict)
+    provider_network: Optional[ProviderNetwork] = None
+    drug_formulary: Optional[DrugFormulary] = None
     cost_sharing: CostSharing = field(default_factory=CostSharing)
     administrative: Administrative = field(default_factory=Administrative)
+    quality_rating: float = 0.0
+    customer_rating: float = 0.0
+    
+    def __post_init__(self):
+        # Handle backwards compatibility
+        if self.deductible_individual is not None and self.deductible == 0:
+            self.deductible = self.deductible_individual
+        if self.oop_max_individual is not None and self.oop_max == 0:
+            self.oop_max = self.oop_max_individual
 
 
 @dataclass
