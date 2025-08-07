@@ -1,5 +1,8 @@
 # HealthPlan Navigator Architecture - Technical Deep Dive
 
+**Version 1.1.0 - Major API Integration Update**
+*Last Updated: 2025-08-06*
+
 ## Table of Contents
 1. [System Overview](#system-overview)
 2. [Architecture Principles](#architecture-principles)
@@ -29,21 +32,24 @@ HealthPlan Navigator employs a **modular, layered architecture** designed for ex
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           Orchestration Layer                                │
+│                    Unified Orchestration Layer (v1.1.0)                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                      Analysis Engine (engine.py)                             │
-│  • Workflow Coordination  • Plan Comparison  • Result Aggregation           │
+│                      HealthPlanAnalyzer (analyzer.py)                        │
+│  • Unified Interface • API Integration • Workflow Coordination              │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
                     ┌─────────────────┴─────────────────┐
                     ▼                                   ▼
 ┌─────────────────────────────────┐ ┌─────────────────────────────────┐
-│        Business Logic Layer      │ │      Data Processing Layer      │
+│        Business Logic Layer      │ │    Integration Layer (v1.1.0)   │
 ├─────────────────────────────────┤ ├─────────────────────────────────┤
-│   Scoring Engine (score.py)     │ │  Document Parser (ingest.py)    │
-│   • 6-Metric Calculations       │ │  • PDF/DOCX/JSON/CSV Support    │
-│   • Weighted Scoring            │ │  • Text Extraction              │
-│   • Normalization               │ │  • Pattern Recognition          │
+│   Scoring Engine (score.py)     │ │  API Integrations:               │
+│   • 6-Metric Calculations       │ │  • Healthcare.gov API            │
+│   • Weighted Scoring            │ │  • NPPES Provider Registry       │
+│   • Normalization               │ │  • RxNorm Drug Database          │
+│   Analysis Engine (engine.py)   │ │  • GoodRx Pricing (ready)        │
+│   • Plan Comparison             │ │  Data Processing:                │
+│   • Result Aggregation          │ │  • Document Parser (ingest.py)   │
 └─────────────────────────────────┘ └─────────────────────────────────┘
                     │                                   │
                     └─────────────────┬─────────────────┘
@@ -379,40 +385,61 @@ class ReportGenerator:
         """Complete data export for integration"""
 ```
 
-## Data Flow
+## Data Flow (v1.1.0 Enhanced)
 
-### Complete Analysis Pipeline
+### Complete Analysis Pipeline with API Integration
 
 ```
 1. INPUT STAGE
    ├── Client Profile Loading
    │   └── JSON → Client object with validation
-   └── Plan Document Collection
-       └── PDF/DOCX/CSV → File paths list
+   ├── Plan Document Collection (Local)
+   │   └── PDF/DOCX/CSV → File paths list
+   └── API Data Fetching (v1.1.0)
+       ├── Healthcare.gov API
+       │   └── Zipcode → Available plans
+       └── CMS Public Data Fallback
+           └── County FIPS → Plan catalog
 
-2. PARSING STAGE
+2. PARSING & INTEGRATION STAGE
    ├── Document Type Detection
    ├── Content Extraction
    │   ├── Text extraction (pdfplumber/python-docx)
    │   ├── Table parsing
    │   └── Pattern matching
+   ├── API Response Processing (v1.1.0)
+   │   ├── Healthcare.gov JSON → Plan objects
+   │   └── CMS data transformation
    └── Data Normalization
-       └── Raw data → Plan objects
+       └── All sources → Unified Plan objects
 
-3. SCORING STAGE
+3. VALIDATION & ENRICHMENT STAGE (v1.1.0)
+   ├── Provider Network Validation
+   │   ├── NPPES Registry lookup
+   │   ├── Fuzzy name matching (85% threshold)
+   │   └── Specialty verification
+   ├── Medication Coverage Check
+   │   ├── RxNorm drug alternatives
+   │   ├── Formulary tier mapping
+   │   └── GoodRx pricing (when available)
+   └── Data Caching
+       ├── LRU cache for API responses
+       └── Disk cache for plan data
+
+4. SCORING STAGE
    ├── Individual Metric Calculation
-   │   ├── Provider network analysis
-   │   ├── Medication formulary lookup
-   │   ├── Cost projections
-   │   ├── Protection thresholds
-   │   ├── Simplicity factors
-   │   └── Quality ratings
+   │   ├── Provider network analysis (30%)
+   │   ├── Medication formulary lookup (25%)
+   │   ├── Cost projections (20%)
+   │   ├── Protection thresholds (10%)
+   │   ├── Simplicity factors (10%)
+   │   └── Quality ratings (5%)
    ├── Score Normalization
    │   └── Relative scoring for costs
    └── Weighted Aggregation
        └── 6 metrics → Overall score
 
-4. ANALYSIS STAGE
+5. ANALYSIS STAGE
    ├── Plan Ranking
    │   └── Sort by overall score
    ├── Insight Generation
@@ -422,7 +449,7 @@ class ReportGenerator:
    └── Recommendation Logic
        └── Top 3 plans with rationale
 
-5. OUTPUT STAGE
+6. OUTPUT STAGE
    ├── Report Generation
    │   ├── Executive summary (MD)
    │   ├── Scoring matrix (CSV)
@@ -558,34 +585,91 @@ class SpecializedHealthPlanAnalyzer(HealthPlanAnalyzer):
                 plan.scores.plan_quality *= 1.2  # Boost quality importance
 ```
 
-### 4. API Integration Points
+### 4. API Integration Points (v1.1.0 Implementation)
 
-**Provider Network APIs**:
+**Healthcare.gov Integration**:
 ```python
-class NetworkValidator:
-    """Validate provider networks against external APIs"""
+class HealthcareGovAPI:
+    """Complete Healthcare.gov marketplace integration with CMS fallback"""
     
-    def verify_provider(self, provider_name: str, plan_network_id: str) -> bool:
-        """Check if provider is actually in network"""
-        response = requests.get(
-            f"https://api.provider-network.com/verify",
-            params={'provider': provider_name, 'network': plan_network_id}
-        )
-        return response.json()['in_network']
+    def fetch_plans(self, zipcode: str, metal_levels: List[str], 
+                   plan_types: List[str]) -> Dict[str, Any]:
+        """Fetch available plans with automatic fallback"""
+        try:
+            # Try authenticated API first
+            if self.api_key:
+                return self._fetch_marketplace_plans(zipcode, metal_levels, plan_types)
+        except:
+            # Fallback to CMS public data
+            return self._fetch_cms_public_data(zipcode, metal_levels, plan_types)
 ```
 
-**Drug Pricing APIs**:
+**NPPES Provider Registry (Working)**:
+```python
+class ProviderNetworkIntegration:
+    """Real-time provider verification via NPPES"""
+    
+    def verify_provider_in_network(self, provider_name: str, 
+                                  specialty: str) -> Dict[str, Any]:
+        """Verify provider with fuzzy matching"""
+        # Search NPPES registry
+        nppes_results = self._search_nppes(specialty=specialty)
+        
+        # Fuzzy match provider names (85% threshold)
+        from fuzzywuzzy import fuzz
+        matches = []
+        for result in nppes_results:
+            ratio = fuzz.ratio(provider_name, result['basic']['name'])
+            if ratio >= 85:
+                matches.append({
+                    'npi': result['number'],
+                    'name': result['basic']['name'],
+                    'match_score': ratio
+                })
+        return matches
+```
+
+**RxNorm Drug Database (Working)**:
+```python
+class MedicationIntegration:
+    """Drug alternative identification via RxNorm"""
+    
+    def find_alternatives(self, drug_name: str) -> List[Dict[str, str]]:
+        """Find generic alternatives using RxNorm"""
+        # Get RxCUI for brand drug
+        rxcui = self._get_rxcui(drug_name)
+        
+        # Find related generic drugs
+        alternatives = []
+        related = self._get_related_drugs(rxcui, relation_type='tradename_of')
+        for drug in related:
+            alternatives.append({
+                'name': drug['name'],
+                'rxcui': drug['rxcui'],
+                'type': 'generic'
+            })
+        return alternatives
+```
+
+**GoodRx Pricing (Ready for API Key)**:
 ```python
 class DrugPricer:
-    """Get real-time drug pricing information"""
+    """Real-time drug pricing when API key available"""
     
-    def get_drug_price(self, drug_name: str, dosage: str) -> float:
-        """Fetch current cash price for medication"""
-        response = requests.get(
-            f"https://api.drugpricing.com/price",
-            params={'drug': drug_name, 'dosage': dosage}
-        )
-        return response.json()['cash_price']
+    def get_drug_price(self, drug_name: str, dosage: str, 
+                      quantity: int) -> Dict[str, float]:
+        """Fetch current prices from multiple sources"""
+        prices = {}
+        
+        # GoodRx API (when key available)
+        if self.goodrx_api_key:
+            prices['goodrx'] = self._fetch_goodrx_price(drug_name, dosage, quantity)
+        
+        # Fallback to estimates
+        if not prices:
+            prices['estimated'] = self._estimate_drug_cost(drug_name, dosage, quantity)
+        
+        return prices
 ```
 
 ## Performance Optimization

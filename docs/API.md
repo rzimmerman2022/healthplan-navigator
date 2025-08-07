@@ -1,670 +1,604 @@
-# HealthPlan Navigator API Reference
+# HealthPlan Navigator API Reference v1.1.0
 
-## Table of Contents
+## 📚 Table of Contents
 1. [Overview](#overview)
-2. [Core Modules](#core-modules)
-   - [models](#healthplan_navigatorcoremodels)
-   - [ingest](#healthplan_navigatorcoreingest)
-   - [score](#healthplan_navigatorcorescore)
-   - [engine](#healthplan_navigatoranalysisengine)
-   - [report](#healthplan_navigatoroutputreport)
-3. [Data Types](#data-types)
-4. [Usage Examples](#usage-examples)
-5. [Error Handling](#error-handling)
-6. [Extension Guide](#extension-guide)
-7. [API Patterns](#api-patterns)
-8. [Performance Considerations](#performance-considerations)
+2. [Core Architecture](#core-architecture)
+3. [API Modules](#api-modules)
+   - [analyzer](#healthplan_navigatoranalyzer)
+   - [core.models](#healthplan_navigatorcoremodels)
+   - [core.ingest](#healthplan_navigatorcoreingest)
+   - [core.score](#healthplan_navigatorcorescore)
+   - [analysis.engine](#healthplan_navigatoranalysisengine)
+   - [integrations](#healthplan_navigatorintegrations)
+   - [output.report](#healthplan_navigatoroutputreport)
+4. [Data Types & Enums](#data-types--enums)
+5. [Usage Examples](#usage-examples)
+6. [Error Handling](#error-handling)
+7. [Extension Guide](#extension-guide)
+8. [Performance Optimization](#performance-optimization)
+9. [API Integration Patterns](#api-integration-patterns)
 
 ## Overview
 
-The HealthPlan Navigator API provides a comprehensive programmatic interface for healthcare plan analysis. This document details every class, method, and data structure available for developers and AI coding assistants.
+The HealthPlan Navigator API v1.1.0 provides a comprehensive programmatic interface for healthcare plan analysis with **live API integration capabilities**. This document details every class, method, data structure, and integration point available for developers and AI coding assistants.
+
+### 🚀 New in v1.1.0
+- **Unified HealthPlanAnalyzer Interface**: Single entry point for all functionality
+- **Live API Integrations**: Healthcare.gov, NPPES, RxNorm, GoodRx
+- **Enhanced Provider Matching**: Fuzzy string matching algorithms
+- **Medication Intelligence**: Generic alternatives and pricing
+- **Production Infrastructure**: Caching, rate limiting, error handling
 
 ### Package Structure
 ```
 healthplan_navigator/
-├── __init__.py           # Package exports
-├── core/                 # Core functionality
-│   ├── __init__.py
-│   ├── models.py         # Data models
-│   ├── ingest.py         # Document parsing
-│   └── score.py          # Scoring algorithms
-├── analysis/             # Analysis engine
-│   ├── __init__.py
-│   └── engine.py         # Orchestration
-├── output/               # Report generation
-│   ├── __init__.py
-│   └── report.py         # Multi-format output
-└── cli.py               # Command-line interface
+├── __init__.py                    # Package exports and version info
+├── analyzer.py                    # NEW: Unified orchestrator interface
+├── core/                          # Core functionality and models
+│   ├── __init__.py               # Core module exports
+│   ├── models.py                 # Data models and structures
+│   ├── ingest.py                 # Document parsing engines
+│   └── score.py                  # Scoring algorithms
+├── analysis/                      # Analysis engine
+│   ├── __init__.py               # Analysis exports
+│   └── engine.py                 # Orchestration logic
+├── integrations/                  # NEW: External API integrations
+│   ├── __init__.py               # Integration exports
+│   ├── healthcare_gov.py         # Healthcare.gov marketplace API
+│   ├── providers.py              # NPPES provider registry
+│   └── medications.py            # RxNorm and GoodRx APIs
+├── output/                        # Report generation
+│   ├── __init__.py               # Output exports
+│   └── report.py                 # Multi-format generators
+└── cli.py                        # Command-line interface
 ```
 
-## Core Modules
+## Core Architecture
+
+### Design Principles
+- **Type Safety**: Extensive use of Python dataclasses and type hints
+- **Immutability**: Data models are immutable where possible
+- **Separation of Concerns**: Clear module boundaries
+- **Extensibility**: Easy to add new parsers, scorers, and integrations
+- **Error Resilience**: Graceful degradation with fallbacks
+- **Performance**: Caching and parallel processing capabilities
+
+### Data Flow
+```
+[Client Profile] → [Document/API Ingestion] → [Scoring Engine] → [Analysis] → [Reports]
+       ↓                    ↓                       ↓                ↓            ↓
+   Personal Info      Local Files or           6-Metric Scores   Ranking    Multiple Formats
+   Medical Profile    Live API Data            Normalization     Insights   MD/CSV/JSON/HTML
+   Priorities         Parsing/Transform        Weighting         Warnings   Visualizations
+```
+
+## API Modules
+
+### `healthplan_navigator.analyzer`
+**NEW in v1.1.0** - Unified orchestration interface combining all functionality.
+
+#### Class: `HealthPlanAnalyzer`
+Main orchestrator providing a single interface for the complete analysis pipeline.
+
+```python
+class HealthPlanAnalyzer:
+    """
+    Unified orchestrator for healthcare plan analysis with API integration.
+    
+    This class provides a single interface for:
+    - Plan document ingestion (PDF, DOCX, JSON, CSV)
+    - Live API data fetching (Healthcare.gov, NPPES, RxNorm)
+    - Comprehensive scoring and ranking
+    - Multi-format report generation
+    
+    Attributes:
+        parser (DocumentParser): Document parsing engine
+        engine (AnalysisEngine): Analysis orchestration
+        report_generator (ReportGenerator): Report generation
+        healthcare_gov_api (HealthcareGovAPI): Marketplace API client
+        provider_integration (ProviderNetworkIntegration): NPPES integration
+        medication_integration (MedicationIntegration): Drug API integration
+    
+    Example:
+        >>> analyzer = HealthPlanAnalyzer(
+        ...     api_keys={'healthcare_gov': 'KEY', 'goodrx': 'KEY'}
+        ... )
+        >>> report = analyzer.analyze(
+        ...     client=client,
+        ...     healthcare_gov_fetch=True,  # Use live API
+        ...     formats=['summary', 'csv', 'json', 'html']
+        ... )
+    """
+    
+    def __init__(self, output_dir: str = "./reports", 
+                 api_keys: Optional[Dict[str, str]] = None):
+        """
+        Initialize the HealthPlanAnalyzer with optional API keys.
+        
+        Args:
+            output_dir: Directory for generated reports
+            api_keys: Dictionary of API keys for various services
+                - 'healthcare_gov': Healthcare.gov API key
+                - 'nppes': NPPES API key (optional, public API)
+                - 'goodrx': GoodRx API key
+        
+        Example:
+            >>> analyzer = HealthPlanAnalyzer(
+            ...     output_dir="./my_reports",
+            ...     api_keys={'healthcare_gov': 'abc123'}
+            ... )
+        """
+    
+    def analyze(self, 
+                client: Client,
+                plan_sources: Optional[Union[str, List[str]]] = None,
+                healthcare_gov_fetch: bool = False,
+                formats: List[str] = None) -> AnalysisReport:
+        """
+        Run complete analysis pipeline with live API integration.
+        
+        Args:
+            client: Client profile for analysis
+            plan_sources: Path(s) to plan files or directory (optional)
+            healthcare_gov_fetch: Whether to fetch plans from Healthcare.gov API
+            formats: Report formats to generate ['summary', 'csv', 'json', 'html']
+        
+        Returns:
+            AnalysisReport with all scored and ranked plans
+        
+        Example:
+            >>> # Local document analysis
+            >>> report = analyzer.analyze(
+            ...     client=client,
+            ...     plan_sources='./documents/',
+            ...     formats=['summary', 'csv']
+            ... )
+            
+            >>> # Live API analysis
+            >>> report = analyzer.analyze(
+            ...     client=client,
+            ...     healthcare_gov_fetch=True,
+            ...     formats=['all']
+            ... )
+        """
+    
+    def analyze_single_plan(self, client: Client, plan: Plan) -> Dict[str, Any]:
+        """
+        Analyze a single plan for quick assessment.
+        
+        Args:
+            client: Client profile
+            plan: Single plan to analyze
+        
+        Returns:
+            Dictionary with plan analysis results including scores,
+            estimated costs, strengths, and concerns
+        """
+    
+    def get_scoring_matrix(self, report: AnalysisReport) -> List[Dict]:
+        """
+        Get scoring matrix for all analyzed plans.
+        
+        Returns:
+            List of dictionaries with plan names and all metric scores
+        """
+    
+    def get_comparison_summary(self, report: AnalysisReport) -> Dict:
+        """
+        Get comparison summary of analyzed plans.
+        
+        Returns:
+            Dictionary with comparison data including best plans
+            by category, key insights, and warnings
+        """
+```
 
 ### `healthplan_navigator.core.models`
 
-This module contains all data models used throughout the system. All models use Python dataclasses for type safety and immutability.
+Core data models using Python dataclasses for type safety.
 
-#### Classes
-
-##### `PersonalInfo`
-Represents client demographic and eligibility information.
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class PersonalInfo:
-    """Client demographic and eligibility data
-    
-    Attributes:
-        full_name (str): Client's full legal name
-        dob (str): Date of birth in YYYY-MM-DD format
-        zipcode (str): 5-digit ZIP code for plan availability
-        household_size (int): Number of people in tax household
-        annual_income (float): Total household income in USD
-        csr_eligible (bool): Cost-sharing reduction eligibility
-    
-    Example:
-        >>> info = PersonalInfo(
-        ...     full_name="John Smith",
-        ...     dob="1985-06-15",
-        ...     zipcode="85001",
-        ...     household_size=2,
-        ...     annual_income=75000.0,
-        ...     csr_eligible=False
-        ... )
-    """
-    full_name: str
-    dob: str
-    zipcode: str
-    household_size: int
-    annual_income: float
-    csr_eligible: bool
-    
-    def get_age(self) -> int:
-        """Calculate current age from date of birth"""
-        from datetime import datetime
-        birth_date = datetime.strptime(self.dob, "%Y-%m-%d")
-        today = datetime.today()
-        return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-    
-    def get_fpl_percentage(self) -> float:
-        """Calculate income as percentage of Federal Poverty Level"""
-        # 2025 FPL guidelines (simplified)
-        fpl_base = 15060
-        fpl_increment = 5380
-        fpl = fpl_base + (fpl_increment * (self.household_size - 1))
-        return (self.annual_income / fpl) * 100
-```
-
-##### `Provider`
-Represents a healthcare provider with visit frequency.
-
-```python
-@dataclass
-class Provider:
-    """Healthcare provider details
-    
-    Attributes:
-        name (str): Provider's full name (as appears in network directories)
-        specialty (str): Medical specialty (e.g., "Primary Care", "Cardiology")
-        priority (str): "must-keep" or "nice-to-keep"
-        visit_frequency (int): Expected annual visits
-    
-    Example:
-        >>> provider = Provider(
-        ...     name="Dr. Sarah Chen, MD",
-        ...     specialty="Primary Care",
-        ...     priority="must-keep",
-        ...     visit_frequency=4
-        ... )
-    """
-    name: str
-    specialty: str
-    priority: str  # Literal["must-keep", "nice-to-keep"]
-    visit_frequency: int
-    
-    def validate(self):
-        """Validate provider data"""
-        if self.priority not in ["must-keep", "nice-to-keep"]:
-            raise ValueError(f"Invalid priority: {self.priority}")
-        if self.visit_frequency < 0:
-            raise ValueError("Visit frequency cannot be negative")
-```
-
-##### `ManufacturerProgram`
-Represents pharmaceutical manufacturer assistance programs.
-
-```python
-@dataclass
-class ManufacturerProgram:
-    """Manufacturer assistance program details
-    
-    Attributes:
-        exists (bool): Whether a program exists for this medication
-        type (str): Program type - "copay-card", "patient-assistance", "discount"
-        max_benefit (float): Maximum annual benefit amount
-        expected_copay (float): Expected copay with program
-    
-    Example:
-        >>> program = ManufacturerProgram(
-        ...     exists=True,
-        ...     type="copay-card",
-        ...     max_benefit=20000.0,
-        ...     expected_copay=5.0
-        ... )
-    """
-    exists: bool
-    type: Optional[str] = None
-    max_benefit: Optional[float] = None
-    expected_copay: Optional[float] = None
-```
-
-##### `Medication`
-Represents a prescription medication with details.
-
-```python
-@dataclass
-class Medication:
-    """Prescription medication details
-    
-    Attributes:
-        name (str): Medication name (brand or generic)
-        dosage (str): Dosage strength (e.g., "10mg", "100mcg")
-        frequency (str): Dosing frequency (e.g., "Daily", "Twice daily")
-        annual_doses (int): Total doses per year
-        manufacturer_program (Optional[ManufacturerProgram]): Assistance program info
-    
-    Example:
-        >>> medication = Medication(
-        ...     name="Metformin",
-        ...     dosage="500mg",
-        ...     frequency="Daily",
-        ...     annual_doses=365,
-        ...     manufacturer_program=None
-        ... )
-    """
-    name: str
-    dosage: str
-    frequency: str
-    annual_doses: int
-    manufacturer_program: Optional[ManufacturerProgram] = None
-    
-    def calculate_monthly_doses(self) -> float:
-        """Calculate average monthly doses"""
-        return self.annual_doses / 12
-```
-
-##### `MedicalProfile`
-Contains all medical information for a client.
-
-```python
-@dataclass
-class MedicalProfile:
-    """Complete medical profile including providers and medications
-    
-    Attributes:
-        providers (List[Provider]): List of healthcare providers
-        medications (List[Medication]): List of current medications
-        special_treatments (List[SpecialTreatment]): Special medical treatments
-    
-    Example:
-        >>> profile = MedicalProfile(
-        ...     providers=[provider1, provider2],
-        ...     medications=[med1, med2],
-        ...     special_treatments=[]
-        ... )
-    """
-    providers: List[Provider]
-    medications: List[Medication]
-    special_treatments: List[SpecialTreatment] = field(default_factory=list)
-    
-    def get_must_keep_providers(self) -> List[Provider]:
-        """Get only must-keep providers"""
-        return [p for p in self.providers if p.priority == "must-keep"]
-    
-    def get_total_visits(self) -> int:
-        """Calculate total expected annual visits"""
-        return sum(p.visit_frequency for p in self.providers)
-```
-
-##### `Client`
-Complete client profile combining all information.
+#### Class: `Client`
+Complete healthcare consumer profile.
 
 ```python
 @dataclass
 class Client:
-    """Complete healthcare consumer profile
+    """
+    Complete healthcare consumer profile combining personal, medical, and priority data.
+    
+    This is the primary input for plan analysis, containing all information
+    needed to evaluate healthcare plans for an individual or family.
     
     Attributes:
-        personal (PersonalInfo): Demographic information
-        medical_profile (MedicalProfile): Medical needs
-        priorities (Priorities): Decision-making priorities
-    
-    Example:
-        >>> client = Client(
-        ...     personal=personal_info,
-        ...     medical_profile=medical_profile,
-        ...     priorities=priorities
-        ... )
+        personal (PersonalInfo): Demographic and eligibility information
+        medical_profile (MedicalProfile): Healthcare providers and medications
+        priorities (Priorities): Decision-making priorities and preferences
     
     Class Methods:
         from_json(file_path): Load client from JSON file
         from_dict(data): Create client from dictionary
+        validate(): Validate all client data
+    
+    Example:
+        >>> client = Client(
+        ...     personal=PersonalInfo(
+        ...         full_name="John Doe",
+        ...         dob="1980-01-15",
+        ...         zipcode="85001",
+        ...         household_size=2,
+        ...         annual_income=75000,
+        ...         csr_eligible=False
+        ...     ),
+        ...     medical_profile=MedicalProfile(
+        ...         providers=[...],
+        ...         medications=[...],
+        ...         special_treatments=[]
+        ...     ),
+        ...     priorities=Priorities(
+        ...         keep_providers=5,
+        ...         minimize_total_cost=4
+        ...     )
+        ... )
     """
     personal: PersonalInfo
     medical_profile: MedicalProfile
     priorities: Priorities
     
-    @classmethod
-    def from_json(cls, file_path: str) -> 'Client':
-        """Load client profile from JSON file
-        
-        Args:
-            file_path: Path to JSON file
-            
-        Returns:
-            Client instance
-            
-        Example:
-            >>> client = Client.from_json("sample_client.json")
+    def validate(self) -> List[str]:
         """
-        import json
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-        return cls.from_dict(data['client'])
+        Validate client data and return list of validation errors.
+        
+        Returns:
+            List of validation error messages (empty if valid)
+        """
     
-    @classmethod
-    def from_dict(cls, data: dict) -> 'Client':
-        """Create client from dictionary
-        
-        Args:
-            data: Dictionary with client data
-            
-        Returns:
-            Client instance
+    def get_age(self) -> int:
+        """Calculate current age from date of birth."""
+    
+    def get_fpl_percentage(self) -> float:
+        """Calculate income as percentage of Federal Poverty Level."""
+    
+    def estimate_annual_utilization(self) -> Dict[str, int]:
         """
-        return cls(
-            personal=PersonalInfo(**data['personal']),
-            medical_profile=MedicalProfile(**data['medical_profile']),
-            priorities=Priorities(**data['priorities'])
-        )
+        Estimate annual healthcare utilization based on profile.
+        
+        Returns:
+            Dictionary with estimated visits, procedures, and prescriptions
+        """
 ```
 
-##### `Plan`
-Represents a healthcare insurance plan.
+#### Class: `Plan`
+Healthcare insurance plan with comprehensive details.
 
 ```python
 @dataclass
 class Plan:
-    """Healthcare insurance plan details
+    """
+    Healthcare insurance plan with all relevant details for analysis.
+    
+    Represents a complete health insurance plan including costs, coverage,
+    network, formulary, and quality metrics. Supports both local document
+    data and live API data.
     
     Attributes:
         plan_id (str): Unique plan identifier
         issuer (str): Insurance company name
         marketing_name (str): Plan marketing name
-        plan_type (str): HMO, PPO, EPO, or POS
-        metal_level (str): Bronze, Silver, Gold, or Platinum
+        plan_type (PlanType): HMO, PPO, EPO, POS, or HDHP
+        metal_level (MetalLevel): Bronze, Silver, Gold, or Platinum
         monthly_premium (float): Monthly premium cost
-        deductible_individual (float): Individual deductible
-        oop_max_individual (float): Individual out-of-pocket maximum
+        deductible (float): Individual deductible
+        oop_max (float): Individual out-of-pocket maximum
         copay_primary (float): Primary care visit copay
         copay_specialist (float): Specialist visit copay
-        copay_emergency (float): Emergency room copay
+        copay_er (float): Emergency room copay
         coinsurance (float): Coinsurance percentage (0-1)
-        network_providers (List[str]): In-network provider names
-        formulary (Dict[str, str]): Drug name to tier mapping
-        requires_referral (bool): Whether referrals are required
-        star_rating (Optional[float]): CMS star rating (0-5)
-        
+        provider_network (Optional[ProviderNetwork]): Network details
+        drug_formulary (Optional[DrugFormulary]): Medication coverage
+        quality_rating (float): CMS quality rating (0-5)
+        customer_rating (float): Customer satisfaction rating (0-5)
+    
+    Methods:
+        is_provider_in_network(provider): Check provider coverage
+        get_medication_tier(medication): Get formulary tier
+        estimate_annual_cost(client): Estimate total annual costs
+        validate(): Validate plan data
+    
     Example:
         >>> plan = Plan(
-        ...     plan_id="12345",
-        ...     issuer="BlueCross",
-        ...     marketing_name="Gold HMO",
-        ...     plan_type="HMO",
-        ...     metal_level="Gold",
-        ...     monthly_premium=450.0,
-        ...     deductible_individual=1000.0,
-        ...     oop_max_individual=5000.0,
-        ...     copay_primary=20.0,
-        ...     copay_specialist=40.0,
-        ...     copay_emergency=250.0,
-        ...     coinsurance=0.2,
-        ...     network_providers=["Dr. Chen", "Dr. Smith"],
-        ...     formulary={"Metformin": "generic"},
-        ...     requires_referral=True,
-        ...     star_rating=4.5
+        ...     plan_id="12345-GOLD-HMO",
+        ...     issuer="BlueCross BlueShield",
+        ...     marketing_name="Gold HMO Select",
+        ...     plan_type=PlanType.HMO,
+        ...     metal_level=MetalLevel.GOLD,
+        ...     monthly_premium=450.00,
+        ...     deductible=1500.00,
+        ...     oop_max=6000.00,
+        ...     copay_primary=25.00,
+        ...     copay_specialist=50.00,
+        ...     copay_er=300.00,
+        ...     coinsurance=0.20
         ... )
     """
-    plan_id: str
-    issuer: str
-    marketing_name: str
-    plan_type: str  # HMO, PPO, EPO, POS
-    metal_level: str  # Bronze, Silver, Gold, Platinum
-    monthly_premium: float
-    deductible_individual: float
-    oop_max_individual: float
-    copay_primary: float
-    copay_specialist: float
-    copay_emergency: float
-    coinsurance: float
-    network_providers: List[str]
-    formulary: Dict[str, str]  # drug_name -> tier
-    requires_referral: bool
-    star_rating: Optional[float] = None
-    
-    def get_annual_premium(self) -> float:
-        """Calculate annual premium cost"""
-        return self.monthly_premium * 12
-    
-    def is_provider_in_network(self, provider_name: str) -> bool:
-        """Check if provider is in network
-        
-        Args:
-            provider_name: Provider's name to check
-            
-        Returns:
-            True if provider is in network
-        """
-        return any(provider_name in network_provider 
-                  for network_provider in self.network_providers)
-    
-    def get_drug_tier(self, drug_name: str) -> Optional[str]:
-        """Get formulary tier for a medication
-        
-        Args:
-            drug_name: Medication name
-            
-        Returns:
-            Tier name or None if not covered
-        """
-        return self.formulary.get(drug_name)
 ```
 
-##### `ScoringMetrics`
-Contains all scoring metrics for a plan.
+### `healthplan_navigator.integrations`
+
+**NEW in v1.1.0** - Live API integration modules.
+
+#### Module: `healthcare_gov`
+Healthcare.gov marketplace API integration.
 
 ```python
-@dataclass
-class ScoringMetrics:
-    """Scoring results for all 6 metrics (0-10 scale)
+class HealthcareGovAPI:
+    """
+    Interface for Healthcare.gov marketplace API with fallback to CMS public data.
     
-    All scores are on a 0-10 scale where:
-    - 10 = Excellent
-    - 7-9 = Good
-    - 4-6 = Fair
-    - 0-3 = Poor
+    Handles authentication, rate limiting, caching, and data transformation
+    for fetching plan data from the federal marketplace. Includes automatic
+    fallback to CMS public datasets when API keys are unavailable.
     
     Attributes:
-        provider_network_score (float): Provider coverage score
-        medication_coverage_score (float): Medication access score
-        total_cost_score (float): Total cost efficiency score
-        financial_protection_score (float): Catastrophic protection score
-        administrative_simplicity_score (float): Ease of use score
-        plan_quality_score (float): Quality rating score
-        weighted_total_score (float): Overall weighted score
-        
+        BASE_URL: Healthcare.gov API base URL
+        CMS_QHP_URL: CMS public data endpoint (no auth required)
+        session: Configured requests session with retry logic
+        cache_dir: Directory for caching API responses
+    
     Example:
-        >>> metrics = ScoringMetrics(
-        ...     provider_network_score=9.0,
-        ...     medication_coverage_score=8.5,
-        ...     total_cost_score=7.0,
-        ...     financial_protection_score=8.0,
-        ...     administrative_simplicity_score=7.5,
-        ...     plan_quality_score=8.0,
-        ...     weighted_total_score=8.1
+        >>> api = HealthcareGovAPI(api_key="your_key")
+        >>> plans = api.fetch_plans(
+        ...     zipcode="85001",
+        ...     metal_levels=["Silver", "Gold"],
+        ...     plan_types=["HMO", "PPO"]
         ... )
     """
-    provider_network_score: float = 0.0
-    medication_coverage_score: float = 0.0
-    total_cost_score: float = 0.0
-    financial_protection_score: float = 0.0
-    administrative_simplicity_score: float = 0.0
-    plan_quality_score: float = 0.0
-    weighted_total_score: float = 0.0
     
-    def to_dict(self) -> dict:
-        """Convert to dictionary for serialization"""
-        return {
-            'provider_network': self.provider_network_score,
-            'medication_coverage': self.medication_coverage_score,
-            'total_cost': self.total_cost_score,
-            'financial_protection': self.financial_protection_score,
-            'administrative_simplicity': self.administrative_simplicity_score,
-            'plan_quality': self.plan_quality_score,
-            'overall': self.weighted_total_score
-        }
+    def fetch_plans(self, 
+                   zipcode: str,
+                   county_fips: Optional[str] = None,
+                   metal_levels: Optional[List[str]] = None,
+                   plan_types: Optional[List[str]] = None,
+                   year: Optional[int] = None) -> List[Plan]:
+        """
+        Fetch available plans for a given location.
+        
+        First attempts to use CMS public data (no auth required), then
+        falls back to authenticated Healthcare.gov API if available.
+        
+        Args:
+            zipcode: 5-digit ZIP code
+            county_fips: County FIPS code for more accurate results
+            metal_levels: Filter by metal levels
+            plan_types: Filter by plan types
+            year: Plan year (defaults to current year)
+        
+        Returns:
+            List of Plan objects available in the specified area
+        """
+    
+    def fetch_provider_network(self, plan_id: str) -> Optional[ProviderNetwork]:
+        """
+        Fetch provider network details for a specific plan.
+        
+        Args:
+            plan_id: Healthcare.gov plan ID
+        
+        Returns:
+            ProviderNetwork object or None if not available
+        """
+    
+    def fetch_drug_formulary(self, plan_id: str) -> Optional[DrugFormulary]:
+        """
+        Fetch drug formulary for a specific plan.
+        
+        Args:
+            plan_id: Healthcare.gov plan ID
+        
+        Returns:
+            DrugFormulary object or None if not available
+        """
+    
+    def validate_api_access(self) -> bool:
+        """
+        Validate API access and credentials.
+        
+        Returns:
+            True if API is accessible (including public endpoints)
+        """
 ```
 
-##### `PlanAnalysis`
-Complete analysis results for a single plan.
+#### Module: `providers`
+NPPES provider registry integration with fuzzy matching.
 
 ```python
-@dataclass
-class PlanAnalysis:
-    """Complete analysis results for a plan
+class ProviderNetworkIntegration:
+    """
+    Provider network validation using NPPES registry with fuzzy matching.
+    
+    Integrates with the National Provider Identifier (NPI) registry for
+    real-time provider verification. Includes fuzzy string matching for
+    handling name variations and geographic proximity analysis.
     
     Attributes:
-        plan (Plan): The analyzed plan
-        metrics (ScoringMetrics): All scoring metrics
-        cost_breakdown (CostBreakdown): Detailed cost analysis
-        strengths (List[str]): Key strengths of the plan
-        concerns (List[str]): Potential concerns
-        
+        NPPES_API_URL: Public NPPES registry endpoint (no auth required)
+        session: HTTP session for API calls
+        provider_cache: Local cache of provider data
+    
     Example:
-        >>> analysis = PlanAnalysis(
-        ...     plan=plan,
-        ...     metrics=metrics,
-        ...     cost_breakdown=costs,
-        ...     strengths=["All providers in network"],
-        ...     concerns=["High deductible"]
+        >>> provider_api = ProviderNetworkIntegration()
+        >>> providers = provider_api.search_providers(
+        ...     specialty="Cardiology",
+        ...     location="85001",
+        ...     radius_miles=25
+        ... )
+        >>> coverage = provider_api.calculate_network_coverage(
+        ...     client_providers, network
         ... )
     """
-    plan: Plan
-    metrics: ScoringMetrics
-    cost_breakdown: CostBreakdown
-    strengths: List[str] = field(default_factory=list)
-    concerns: List[str] = field(default_factory=list)
     
-    def get_summary(self) -> str:
-        """Generate one-line summary of plan"""
-        return f"{self.plan.marketing_name}: {self.metrics.weighted_total_score:.1f}/10"
+    def search_providers(self, 
+                        specialty: Optional[str] = None,
+                        location: Optional[str] = None,
+                        radius_miles: int = 25) -> List[Dict]:
+        """
+        Search NPPES registry for providers.
+        
+        Uses the public NPPES API to search for healthcare providers
+        by specialty and location. No authentication required.
+        
+        Args:
+            specialty: Medical specialty to search for
+            location: ZIP code or city/state
+            radius_miles: Search radius in miles
+        
+        Returns:
+            List of provider dictionaries with NPI, name, specialty, address
+        """
+    
+    def check_provider_in_network(self, 
+                                  provider: Provider, 
+                                  network: ProviderNetwork,
+                                  fuzzy_match: bool = True) -> bool:
+        """
+        Check if a provider is in a specific network using fuzzy matching.
+        
+        Args:
+            provider: Provider to check
+            network: Network to search in
+            fuzzy_match: Whether to use fuzzy string matching (85% threshold)
+        
+        Returns:
+            True if provider is found in network
+        """
+    
+    def calculate_network_coverage(self, 
+                                   client_providers: List[Provider],
+                                   network: ProviderNetwork) -> Dict[str, Any]:
+        """
+        Calculate comprehensive network coverage statistics.
+        
+        Args:
+            client_providers: Client's current providers
+            network: Network to evaluate
+        
+        Returns:
+            Dictionary with coverage percentages, must-keep coverage,
+            and provider-by-provider breakdown
+        """
+    
+    def estimate_network_size(self, network: ProviderNetwork) -> str:
+        """
+        Estimate the size/breadth of a provider network.
+        
+        Returns:
+            'Large', 'Medium', 'Small', or 'Unknown'
+        """
 ```
 
-### `healthplan_navigator.core.ingest`
-
-Document parsing functionality supporting multiple formats.
-
-#### Classes
-
-##### `DocumentParser`
-Main parser class handling all document formats.
+#### Module: `medications`
+RxNorm drug database and GoodRx pricing integration.
 
 ```python
-class DocumentParser:
-    """Multi-format document parser for healthcare plans
+class MedicationIntegration:
+    """
+    Medication analysis using RxNorm database and pricing APIs.
     
-    Supports parsing of PDF, DOCX, JSON, and CSV files containing
-    healthcare plan information. Automatically detects format and
-    routes to appropriate parser.
+    Integrates with RxNorm for drug information and generic alternatives,
+    and GoodRx for pricing (when API key available). Includes formulary
+    checking and annual cost calculations.
+    
+    Attributes:
+        RXNORM_API_URL: Public RxNorm API endpoint (no auth required)
+        OPENFDA_API_URL: Public FDA drug database endpoint
+        goodrx_api_key: Optional GoodRx API key for pricing
+        drug_cache: Local cache of drug information
+        price_cache: Local cache of pricing data
     
     Example:
-        >>> parser = DocumentParser()
-        >>> plan = parser.parse_document("plan.pdf")
-        >>> plans = parser.parse_batch("./documents/")
+        >>> med_api = MedicationIntegration(goodrx_api_key="key")
+        >>> alternatives = med_api.find_generic_alternatives(medication)
+        >>> coverage = med_api.check_medication_coverage(medication, formulary)
+        >>> price = med_api.get_medication_price(medication, "85001")
     """
     
-    def __init__(self):
-        """Initialize parser with default configuration"""
-        self.pdf_parser = PDFParser()
-        self.docx_parser = DOCXParser()
-        self.json_parser = JSONParser()
-        self.csv_parser = CSVParser()
-    
-    def parse_document(self, file_path: str) -> Optional[Plan]:
-        """Parse a single document file
+    def check_medication_coverage(self, 
+                                  medication: Medication,
+                                  formulary: DrugFormulary) -> Dict[str, Any]:
+        """
+        Check if a medication is covered by a formulary.
         
         Args:
-            file_path: Path to document file
-            
+            medication: Medication to check
+            formulary: Plan's drug formulary
+        
         Returns:
-            Plan object or None if parsing fails
-            
-        Raises:
-            ValueError: If file format is not supported
-            IOError: If file cannot be read
-            
-        Example:
-            >>> plan = parser.parse_document("BlueCross_Gold.pdf")
-            >>> if plan:
-            ...     print(f"Parsed {plan.marketing_name}")
+            Dictionary with coverage status, tier, copay, and restrictions
         """
-        if not os.path.exists(file_path):
-            raise IOError(f"File not found: {file_path}")
-        
-        ext = os.path.splitext(file_path)[1].lower()
-        
-        if ext == '.pdf':
-            return self.pdf_parser.parse(file_path)
-        elif ext == '.docx':
-            return self.docx_parser.parse(file_path)
-        elif ext == '.json':
-            return self.json_parser.parse(file_path)
-        elif ext == '.csv':
-            plans = self.csv_parser.parse(file_path)
-            return plans[0] if plans else None
-        else:
-            raise ValueError(f"Unsupported file format: {ext}")
     
-    def parse_batch(self, directory_path: str, 
-                   recursive: bool = False) -> List[Plan]:
-        """Parse all supported documents in a directory
+    def find_generic_alternatives(self, medication: Medication) -> List[Dict[str, str]]:
+        """
+        Find generic alternatives using RxNorm API.
+        
+        Queries the public RxNorm database for generic equivalents
+        and therapeutic alternatives.
         
         Args:
-            directory_path: Path to directory containing documents
-            recursive: Whether to search subdirectories
-            
+            medication: Brand medication
+        
         Returns:
-            List of successfully parsed plans
-            
-        Example:
-            >>> plans = parser.parse_batch("./personal_documents/")
-            >>> print(f"Parsed {len(plans)} plans")
+            List of generic alternatives with names, RxCUI codes,
+            and potential savings estimates
         """
-        plans = []
-        patterns = ['*.pdf', '*.docx', '*.json', '*.csv']
-        
-        for pattern in patterns:
-            if recursive:
-                files = glob.glob(os.path.join(directory_path, '**', pattern), 
-                                recursive=True)
-            else:
-                files = glob.glob(os.path.join(directory_path, pattern))
-            
-            for file_path in files:
-                try:
-                    if pattern == '*.csv':
-                        plans.extend(self.csv_parser.parse(file_path))
-                    else:
-                        plan = self.parse_document(file_path)
-                        if plan:
-                            plans.append(plan)
-                except Exception as e:
-                    print(f"Error parsing {file_path}: {e}")
-        
-        return plans
-```
-
-##### `PDFParser`
-Specialized parser for PDF documents.
-
-```python
-class PDFParser:
-    """PDF document parser using pdfplumber
     
-    Extracts plan information from PDF documents using text extraction
-    and pattern matching. Includes OCR fallback for scanned documents.
-    
-    Example:
-        >>> parser = PDFParser()
-        >>> plan = parser.parse("plan.pdf")
-    """
-    
-    def parse(self, file_path: str) -> Optional[Plan]:
-        """Parse PDF document
+    def get_medication_price(self, 
+                            medication: Medication,
+                            zipcode: str,
+                            quantity: int = 30) -> Dict[str, float]:
+        """
+        Get medication prices from various sources.
         
         Args:
-            file_path: Path to PDF file
-            
-        Returns:
-            Plan object or None if parsing fails
-        """
-        import pdfplumber
+            medication: Medication to price
+            zipcode: Location for pricing
+            quantity: Quantity (default 30-day supply)
         
-        try:
-            with pdfplumber.open(file_path) as pdf:
-                text = ""
-                for page in pdf.pages:
-                    text += page.extract_text() or ""
-                
-                # Extract plan data using patterns
-                plan_data = self._extract_plan_data(text)
-                
-                if plan_data:
-                    return Plan(**plan_data)
-                    
-        except Exception as e:
-            print(f"PDF parsing error: {e}")
-            
-        return None
+        Returns:
+            Dictionary with cash price, GoodRx price (if available),
+            and insurance copay estimates by tier
+        """
     
-    def _extract_plan_data(self, text: str) -> dict:
-        """Extract plan data from text using regex patterns
+    def calculate_annual_medication_cost(self, 
+                                        medications: List[Medication],
+                                        formulary: DrugFormulary,
+                                        plan_copays: Dict[str, float]) -> float:
+        """
+        Calculate estimated annual medication costs for a plan.
         
         Args:
-            text: Extracted text from PDF
-            
+            medications: List of client medications
+            formulary: Plan's drug formulary
+            plan_copays: Plan's copay structure by tier
+        
         Returns:
-            Dictionary of plan attributes
+            Estimated annual medication cost in USD
         """
-        patterns = {
-            'marketing_name': r'Plan Name:\s*(.+)',
-            'issuer': r'Insurance Company:\s*(.+)',
-            'monthly_premium': r'Monthly Premium:\s*\$?([\d,]+\.?\d*)',
-            'deductible_individual': r'Individual Deductible:\s*\$?([\d,]+)',
-            'oop_max_individual': r'Out-of-Pocket Maximum:\s*\$?([\d,]+)',
-            # Add more patterns as needed
-        }
-        
-        data = {}
-        for field, pattern in patterns.items():
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                value = match.group(1).strip()
-                # Convert numeric fields
-                if field in ['monthly_premium', 'deductible_individual', 
-                           'oop_max_individual']:
-                    value = float(value.replace(',', ''))
-                data[field] = value
-        
-        return data
 ```
 
 ### `healthplan_navigator.core.score`
 
-Scoring algorithm implementation with detailed metric calculations.
+Sophisticated 6-metric scoring system implementation.
 
-#### Classes
-
-##### `HealthPlanScorer`
-Implements the 6-metric scoring system.
+#### Class: `HealthPlanScorer`
+Implements weighted scoring across six key metrics.
 
 ```python
 class HealthPlanScorer:
-    """Healthcare plan scoring engine
+    """
+    Healthcare plan scoring engine with configurable weights.
     
     Implements a sophisticated 6-metric scoring system where each
     metric is scored 0-10 and weighted to produce an overall score.
+    Supports custom weights for different prioritization strategies.
     
     Default Weights:
         - Provider Network: 30%
@@ -675,622 +609,41 @@ class HealthPlanScorer:
         - Plan Quality: 5%
     
     Example:
+        >>> # Default scorer
         >>> scorer = HealthPlanScorer()
-        >>> analysis = scorer.score_plan(client, plan, all_plans)
-        >>> print(f"Overall score: {analysis.metrics.weighted_total_score}")
+        
+        >>> # Custom weights emphasizing providers
+        >>> custom_weights = {
+        ...     'provider_network': 0.40,
+        ...     'medication_coverage': 0.20,
+        ...     'total_cost': 0.20,
+        ...     'financial_protection': 0.10,
+        ...     'administrative_simplicity': 0.05,
+        ...     'plan_quality': 0.05
+        ... }
+        >>> scorer = HealthPlanScorer(weights=custom_weights)
     """
-    
-    # Default metric weights (must sum to 1.0)
-    DEFAULT_WEIGHTS = {
-        'provider_network': 0.30,
-        'medication_coverage': 0.25,
-        'total_cost': 0.20,
-        'financial_protection': 0.10,
-        'administrative_simplicity': 0.10,
-        'plan_quality': 0.05
-    }
-    
-    def __init__(self, weights: Optional[Dict[str, float]] = None):
-        """Initialize scorer with optional custom weights
-        
-        Args:
-            weights: Custom metric weights (must sum to 1.0)
-            
-        Raises:
-            ValueError: If weights don't sum to 1.0
-        """
-        self.weights = weights or self.DEFAULT_WEIGHTS
-        
-        if abs(sum(self.weights.values()) - 1.0) > 0.001:
-            raise ValueError("Weights must sum to 1.0")
     
     def score_plan(self, client: Client, plan: Plan, 
                    all_plans: List[Plan]) -> PlanAnalysis:
-        """Score a single plan for a client
+        """
+        Score a single plan for a client with detailed analysis.
+        
+        Performs comprehensive scoring across all metrics, calculates
+        weighted total, identifies strengths and concerns, and estimates
+        total annual costs.
         
         Args:
             client: Client profile with requirements
             plan: Plan to score
             all_plans: All plans for cost normalization
-            
+        
         Returns:
-            Complete analysis with scores and insights
-            
-        Example:
-            >>> analysis = scorer.score_plan(client, plan, all_plans)
-            >>> print(f"Provider score: {analysis.metrics.provider_network_score}")
+            PlanAnalysis with scores, cost breakdown, and insights
         """
-        metrics = ScoringMetrics()
-        
-        # Calculate individual metrics
-        metrics.provider_network_score = self._score_provider_network(client, plan)
-        metrics.medication_coverage_score = self._score_medication_coverage(client, plan)
-        metrics.total_cost_score = self._score_total_cost(client, plan, all_plans)
-        metrics.financial_protection_score = self._score_financial_protection(plan)
-        metrics.administrative_simplicity_score = self._score_administrative_simplicity(plan)
-        metrics.plan_quality_score = self._score_plan_quality(plan)
-        
-        # Calculate weighted total
-        metrics.weighted_total_score = self._calculate_weighted_total(metrics)
-        
-        # Generate cost breakdown
-        cost_breakdown = self._calculate_cost_breakdown(client, plan)
-        
-        # Identify strengths and concerns
-        strengths, concerns = self._analyze_plan_characteristics(client, plan, metrics)
-        
-        return PlanAnalysis(
-            plan=plan,
-            metrics=metrics,
-            cost_breakdown=cost_breakdown,
-            strengths=strengths,
-            concerns=concerns
-        )
-    
-    def _score_provider_network(self, client: Client, plan: Plan) -> float:
-        """Score provider network coverage (0-10)
-        
-        Scoring logic:
-        - 10 points: 100% must-keep providers in network
-        - 7 points: 80-99% must-keep providers in network
-        - 4 points: 50-79% must-keep providers in network
-        - 0 points: <50% must-keep providers in network
-        - -2 penalty if referrals required
-        
-        Args:
-            client: Client with provider list
-            plan: Plan with network
-            
-        Returns:
-            Score from 0-10
-        """
-        must_keep = client.medical_profile.get_must_keep_providers()
-        if not must_keep:
-            return 10.0  # No providers to keep = perfect score
-        
-        in_network = sum(1 for p in must_keep 
-                        if plan.is_provider_in_network(p.name))
-        coverage_ratio = in_network / len(must_keep)
-        
-        # Base score from coverage
-        if coverage_ratio == 1.0:
-            score = 10.0
-        elif coverage_ratio >= 0.8:
-            score = 7.0 + (coverage_ratio - 0.8) * 15  # Linear 7-10
-        elif coverage_ratio >= 0.5:
-            score = 4.0 + (coverage_ratio - 0.5) * 6   # Linear 4-7
-        else:
-            score = coverage_ratio * 8  # Linear 0-4
-        
-        # Apply penalties
-        if plan.requires_referral:
-            score = max(0, score - 2.0)
-        
-        return round(score, 1)
-    
-    def _score_medication_coverage(self, client: Client, plan: Plan) -> float:
-        """Score medication coverage and access (0-10)
-        
-        Scoring per medication:
-        - Covered on formulary: 10 points
-        - Not covered but manufacturer program: 6 points
-        - Not covered, no assistance: 0 points
-        
-        Modifiers:
-        - -2 if prior authorization likely
-        - -3 if maximizer program used
-        - +2 if preferred tier with low copay
-        
-        Args:
-            client: Client with medication list
-            plan: Plan with formulary
-            
-        Returns:
-            Score from 0-10
-        """
-        medications = client.medical_profile.medications
-        if not medications:
-            return 10.0  # No medications = perfect score
-        
-        total_score = 0
-        
-        for med in medications:
-            med_score = 0
-            tier = plan.get_drug_tier(med.name)
-            
-            if tier:
-                # Medication is covered
-                if tier in ['generic', 'preferred-generic']:
-                    med_score = 10
-                elif tier in ['preferred-brand', 'preferred']:
-                    med_score = 9
-                elif tier == 'non-preferred':
-                    med_score = 7
-                elif tier == 'specialty':
-                    med_score = 5
-                else:
-                    med_score = 6  # Unknown tier
-            elif med.manufacturer_program and med.manufacturer_program.exists:
-                # Not covered but has assistance
-                med_score = 6
-            else:
-                # Not covered, no assistance
-                med_score = 0
-            
-            # Apply modifiers
-            if tier == 'specialty':
-                med_score -= 2  # Prior auth likely
-            
-            total_score += max(0, med_score)
-        
-        return round(total_score / len(medications), 1)
-    
-    def _score_total_cost(self, client: Client, plan: Plan, 
-                         all_plans: List[Plan]) -> float:
-        """Score total annual cost (0-10, normalized)
-        
-        Calculates estimated total annual cost including:
-        - Premiums
-        - Deductible (if likely to meet)
-        - Copays/coinsurance
-        - Medication costs
-        
-        Then normalizes against all plans where:
-        - Lowest cost = 10 points
-        - Highest cost = 0 points
-        - Others scaled proportionally
-        
-        Args:
-            client: Client profile
-            plan: Plan to score
-            all_plans: All plans for normalization
-            
-        Returns:
-            Normalized score from 0-10
-        """
-        # Calculate costs for this plan
-        annual_cost = self._estimate_annual_cost(client, plan)
-        
-        # Calculate costs for all plans
-        all_costs = [self._estimate_annual_cost(client, p) for p in all_plans]
-        min_cost = min(all_costs)
-        max_cost = max(all_costs)
-        
-        # Normalize
-        if max_cost == min_cost:
-            return 5.0  # All plans cost the same
-        
-        # Invert scale (lower cost = higher score)
-        normalized = 1 - (annual_cost - min_cost) / (max_cost - min_cost)
-        return round(normalized * 10, 1)
-    
-    def _estimate_annual_cost(self, client: Client, plan: Plan) -> float:
-        """Estimate total annual healthcare costs
-        
-        Args:
-            client: Client profile
-            plan: Plan to analyze
-            
-        Returns:
-            Estimated annual cost in USD
-        """
-        # Base premium
-        annual_cost = plan.get_annual_premium()
-        
-        # Estimate utilization
-        total_visits = client.medical_profile.get_total_visits()
-        pcp_visits = sum(p.visit_frequency for p in client.medical_profile.providers 
-                        if p.specialty == "Primary Care")
-        specialist_visits = total_visits - pcp_visits
-        
-        # Add expected copays
-        annual_cost += pcp_visits * plan.copay_primary
-        annual_cost += specialist_visits * plan.copay_specialist
-        
-        # Estimate medication costs
-        for med in client.medical_profile.medications:
-            tier = plan.get_drug_tier(med.name)
-            if tier:
-                # Estimate copay based on tier
-                copay_map = {
-                    'generic': 10,
-                    'preferred': 35,
-                    'non-preferred': 70,
-                    'specialty': 200
-                }
-                copay = copay_map.get(tier, 50)
-                annual_cost += copay * 12  # Monthly fills
-            elif med.manufacturer_program and med.manufacturer_program.exists:
-                annual_cost += med.manufacturer_program.expected_copay * 12
-            else:
-                # Cash price estimate
-                annual_cost += 150 * 12  # Default estimate
-        
-        # Consider deductible if high utilization expected
-        if total_visits > 10:
-            annual_cost += plan.deductible_individual * 0.75  # Likely to meet
-        
-        return annual_cost
 ```
 
-### `healthplan_navigator.analysis.engine`
-
-Main analysis orchestration engine.
-
-#### Classes
-
-##### `HealthPlanAnalyzer`
-Coordinates the complete analysis workflow.
-
-```python
-class HealthPlanAnalyzer:
-    """Main healthcare plan analysis engine
-    
-    Orchestrates the complete analysis workflow from document parsing
-    through scoring to report generation. This is the primary entry
-    point for programmatic usage.
-    
-    Example:
-        >>> analyzer = HealthPlanAnalyzer(client)
-        >>> analyzer.add_plan_from_file("plan1.pdf")
-        >>> analyzer.add_plan_from_file("plan2.pdf")
-        >>> results = analyzer.analyze()
-        >>> analyzer.generate_reports("./output/")
-    """
-    
-    def __init__(self, client: Client, scorer: Optional[HealthPlanScorer] = None):
-        """Initialize analyzer with client profile
-        
-        Args:
-            client: Client profile with requirements
-            scorer: Optional custom scorer (uses default if None)
-        """
-        self.client = client
-        self.scorer = scorer or HealthPlanScorer()
-        self.parser = DocumentParser()
-        self.plans = []
-        self.results = None
-    
-    @classmethod
-    def from_file(cls, client_file: str, 
-                  scorer: Optional[HealthPlanScorer] = None) -> 'HealthPlanAnalyzer':
-        """Create analyzer from client JSON file
-        
-        Args:
-            client_file: Path to client JSON file
-            scorer: Optional custom scorer
-            
-        Returns:
-            Configured analyzer instance
-            
-        Example:
-            >>> analyzer = HealthPlanAnalyzer.from_file("client.json")
-        """
-        client = Client.from_json(client_file)
-        return cls(client, scorer)
-    
-    def add_plan_from_file(self, file_path: str) -> bool:
-        """Add a plan from document file
-        
-        Args:
-            file_path: Path to plan document
-            
-        Returns:
-            True if successfully added
-            
-        Example:
-            >>> success = analyzer.add_plan_from_file("BlueCross_Gold.pdf")
-        """
-        try:
-            plan = self.parser.parse_document(file_path)
-            if plan:
-                self.plans.append(plan)
-                return True
-        except Exception as e:
-            print(f"Error adding plan from {file_path}: {e}")
-        return False
-    
-    def add_plan(self, plan: Plan):
-        """Add a plan directly
-        
-        Args:
-            plan: Plan object to add
-            
-        Example:
-            >>> analyzer.add_plan(my_plan)
-        """
-        self.plans.append(plan)
-    
-    def add_plans_from_directory(self, directory: str, recursive: bool = False):
-        """Add all plans from a directory
-        
-        Args:
-            directory: Directory containing plan documents
-            recursive: Whether to search subdirectories
-            
-        Example:
-            >>> analyzer.add_plans_from_directory("./plans/", recursive=True)
-        """
-        parsed_plans = self.parser.parse_batch(directory, recursive)
-        self.plans.extend(parsed_plans)
-        print(f"Added {len(parsed_plans)} plans from {directory}")
-    
-    def analyze(self) -> 'AnalysisResults':
-        """Run complete analysis on all plans
-        
-        Performs scoring, ranking, and insight generation for all
-        added plans. Results are cached for report generation.
-        
-        Returns:
-            AnalysisResults object with complete findings
-            
-        Raises:
-            ValueError: If no plans added
-            
-        Example:
-            >>> results = analyzer.analyze()
-            >>> print(f"Best plan: {results.get_top_plan().plan.marketing_name}")
-        """
-        if not self.plans:
-            raise ValueError("No plans to analyze. Add plans first.")
-        
-        # Score all plans
-        analyses = []
-        for plan in self.plans:
-            analysis = self.scorer.score_plan(self.client, plan, self.plans)
-            analyses.append(analysis)
-        
-        # Sort by overall score
-        analyses.sort(key=lambda a: a.metrics.weighted_total_score, reverse=True)
-        
-        # Generate insights
-        insights = self._generate_insights(analyses)
-        
-        # Create results
-        self.results = AnalysisResults(
-            client=self.client,
-            plan_analyses=analyses,
-            insights=insights,
-            analysis_date=datetime.now()
-        )
-        
-        return self.results
-    
-    def _generate_insights(self, analyses: List[PlanAnalysis]) -> Dict[str, Any]:
-        """Generate high-level insights from analyses
-        
-        Args:
-            analyses: Sorted list of plan analyses
-            
-        Returns:
-            Dictionary of insights
-        """
-        insights = {
-            'total_plans_analyzed': len(analyses),
-            'score_range': {
-                'highest': analyses[0].metrics.weighted_total_score,
-                'lowest': analyses[-1].metrics.weighted_total_score
-            },
-            'best_by_category': self._find_best_by_category(analyses),
-            'key_findings': self._generate_key_findings(analyses),
-            'warnings': self._generate_warnings(analyses)
-        }
-        
-        return insights
-    
-    def _find_best_by_category(self, analyses: List[PlanAnalysis]) -> dict:
-        """Find best plans by specific criteria
-        
-        Args:
-            analyses: All plan analyses
-            
-        Returns:
-            Dictionary of category winners
-        """
-        return {
-            'overall': analyses[0],
-            'lowest_cost': min(analyses, 
-                             key=lambda a: a.cost_breakdown.total_annual_cost),
-            'best_providers': max(analyses, 
-                                key=lambda a: a.metrics.provider_network_score),
-            'best_medications': max(analyses, 
-                                  key=lambda a: a.metrics.medication_coverage_score),
-            'best_protection': max(analyses, 
-                                 key=lambda a: a.metrics.financial_protection_score)
-        }
-    
-    def generate_reports(self, output_dir: str):
-        """Generate all report formats
-        
-        Creates comprehensive reports in multiple formats:
-        - Executive summary (Markdown)
-        - Scoring matrix (CSV)
-        - Interactive dashboard (HTML)
-        - Raw data export (JSON)
-        
-        Args:
-            output_dir: Directory for output files
-            
-        Raises:
-            ValueError: If analysis not run yet
-            
-        Example:
-            >>> analyzer.generate_reports("./output/2024-01-15/")
-        """
-        if not self.results:
-            raise ValueError("No results to report. Run analyze() first.")
-        
-        # Create output directory
-        os.makedirs(output_dir, exist_ok=True)
-        
-        # Initialize report generator
-        generator = ReportGenerator()
-        
-        # Generate all formats
-        generator.generate_executive_summary(self.results, output_dir)
-        generator.generate_scoring_matrix_csv(self.results, output_dir)
-        generator.generate_html_dashboard(self.results, output_dir)
-        generator.generate_json_export(self.results, output_dir)
-        
-        print(f"Reports generated in: {output_dir}")
-```
-
-### `healthplan_navigator.output.report`
-
-Report generation in multiple formats.
-
-#### Classes
-
-##### `ReportGenerator`
-Generates reports in various formats.
-
-```python
-class ReportGenerator:
-    """Multi-format report generator
-    
-    Transforms analysis results into consumable reports in various
-    formats suitable for different audiences and use cases.
-    
-    Supported formats:
-    - Markdown: Human-readable executive summary
-    - CSV: Detailed scoring matrix for spreadsheets
-    - HTML: Interactive dashboard with visualizations
-    - JSON: Complete data export for integration
-    
-    Example:
-        >>> generator = ReportGenerator()
-        >>> generator.generate_all_reports(results, "./output/")
-    """
-    
-    def generate_all_reports(self, results: AnalysisResults, output_dir: str):
-        """Generate all report formats
-        
-        Args:
-            results: Analysis results to report
-            output_dir: Directory for output files
-        """
-        self.generate_executive_summary(results, output_dir)
-        self.generate_scoring_matrix_csv(results, output_dir)
-        self.generate_html_dashboard(results, output_dir)
-        self.generate_json_export(results, output_dir)
-    
-    def generate_executive_summary(self, results: AnalysisResults, 
-                                 output_dir: str) -> str:
-        """Generate executive summary in Markdown
-        
-        Creates a human-readable summary with:
-        - Top recommendations
-        - Key findings
-        - Plan comparisons
-        - Important warnings
-        
-        Args:
-            results: Analysis results
-            output_dir: Output directory
-            
-        Returns:
-            Path to generated file
-            
-        Example:
-            >>> path = generator.generate_executive_summary(results, "./output/")
-            >>> print(f"Summary saved to: {path}")
-        """
-        output_path = os.path.join(output_dir, "executive_summary.md")
-        
-        with open(output_path, 'w') as f:
-            # Write header
-            f.write("# Healthcare Plan Analysis Report\n\n")
-            f.write(f"Generated: {results.analysis_date.strftime('%Y-%m-%d %H:%M')}\n")
-            f.write(f"Client: {results.client.personal.full_name}\n\n")
-            
-            # Top recommendation
-            top_plan = results.get_top_plan()
-            f.write("## 🏆 Top Recommendation\n\n")
-            f.write(f"**{top_plan.plan.marketing_name}** ")
-            f.write(f"(Score: {top_plan.metrics.weighted_total_score:.1f}/10)\n\n")
-            
-            # Why recommended
-            f.write("### Why This Plan?\n")
-            for strength in top_plan.strengths[:3]:
-                f.write(f"- ✅ {strength}\n")
-            f.write("\n")
-            
-            # Key metrics
-            f.write("### Key Metrics\n")
-            f.write(f"- **Monthly Premium**: ${top_plan.plan.monthly_premium:,.0f}\n")
-            f.write(f"- **Annual Cost Estimate**: ${top_plan.cost_breakdown.total_annual_cost:,.0f}\n")
-            f.write(f"- **Deductible**: ${top_plan.plan.deductible_individual:,.0f}\n")
-            f.write(f"- **Out-of-Pocket Max**: ${top_plan.plan.oop_max_individual:,.0f}\n\n")
-            
-            # Alternatives
-            f.write("## 🔄 Alternative Options\n\n")
-            for i, analysis in enumerate(results.plan_analyses[1:3], 2):
-                f.write(f"### {i}. {analysis.plan.marketing_name} ")
-                f.write(f"(Score: {analysis.metrics.weighted_total_score:.1f}/10)\n")
-                f.write(f"- **Best for**: {self._get_plan_strength(analysis)}\n")
-                f.write(f"- **Monthly Premium**: ${analysis.plan.monthly_premium:,.0f}\n")
-                f.write(f"- **Annual Cost**: ${analysis.cost_breakdown.total_annual_cost:,.0f}\n\n")
-            
-            # Category winners
-            f.write("## 🏅 Best in Category\n\n")
-            categories = results.insights['best_by_category']
-            
-            f.write(f"- **Lowest Cost**: {categories['lowest_cost'].plan.marketing_name} ")
-            f.write(f"(${categories['lowest_cost'].cost_breakdown.total_annual_cost:,.0f}/year)\n")
-            
-            f.write(f"- **Best Provider Coverage**: {categories['best_providers'].plan.marketing_name} ")
-            f.write(f"({categories['best_providers'].metrics.provider_network_score:.1f}/10)\n")
-            
-            f.write(f"- **Best Medication Coverage**: {categories['best_medications'].plan.marketing_name} ")
-            f.write(f"({categories['best_medications'].metrics.medication_coverage_score:.1f}/10)\n\n")
-            
-            # Warnings
-            if results.insights['warnings']:
-                f.write("## ⚠️ Important Considerations\n\n")
-                for warning in results.insights['warnings']:
-                    f.write(f"- {warning}\n")
-                f.write("\n")
-            
-            # Detailed comparison
-            f.write("## 📊 Detailed Comparison\n\n")
-            f.write("| Plan | Overall | Providers | Medications | Cost | Protection | Simplicity | Quality |\n")
-            f.write("|------|---------|-----------|-------------|------|------------|------------|----------|\n")
-            
-            for analysis in results.plan_analyses[:5]:
-                m = analysis.metrics
-                f.write(f"| {analysis.plan.marketing_name[:20]} ")
-                f.write(f"| **{m.weighted_total_score:.1f}** ")
-                f.write(f"| {m.provider_network_score:.1f} ")
-                f.write(f"| {m.medication_coverage_score:.1f} ")
-                f.write(f"| {m.total_cost_score:.1f} ")
-                f.write(f"| {m.financial_protection_score:.1f} ")
-                f.write(f"| {m.administrative_simplicity_score:.1f} ")
-                f.write(f"| {m.plan_quality_score:.1f} |\n")
-        
-        return output_path
-```
-
-## Data Types
+## Data Types & Enums
 
 ### Enumerations
 
@@ -1298,23 +651,26 @@ class ReportGenerator:
 from enum import Enum
 
 class MetalLevel(Enum):
-    """Health plan metal levels"""
+    """Health plan metal levels per ACA standards."""
     BRONZE = "Bronze"
     SILVER = "Silver"
     GOLD = "Gold"
     PLATINUM = "Platinum"
+    CATASTROPHIC = "Catastrophic"
 
 class PlanType(Enum):
-    """Health plan types"""
-    HMO = "HMO"
-    PPO = "PPO"
-    EPO = "EPO"
-    POS = "POS"
+    """Health plan network types."""
+    HMO = "HMO"  # Health Maintenance Organization
+    PPO = "PPO"  # Preferred Provider Organization
+    EPO = "EPO"  # Exclusive Provider Organization
+    POS = "POS"  # Point of Service
+    HDHP = "HDHP"  # High Deductible Health Plan
 
 class Priority(Enum):
-    """Provider priority levels"""
+    """Provider priority levels for network analysis."""
     MUST_KEEP = "must-keep"
     NICE_TO_KEEP = "nice-to-keep"
+    OPTIONAL = "optional"
 ```
 
 ### Type Aliases
@@ -1322,539 +678,754 @@ class Priority(Enum):
 ```python
 from typing import TypeAlias
 
-# Common type aliases used throughout
+# Identifiers
 PlanID: TypeAlias = str
-ProviderName: TypeAlias = str
-DrugName: TypeAlias = str
-DrugTier: TypeAlias = str
+ProviderNPI: TypeAlias = str
+DrugRxCUI: TypeAlias = str
+
+# Scoring
 Score: TypeAlias = float  # 0.0 to 10.0
+Weight: TypeAlias = float  # 0.0 to 1.0
+
+# Financial
 Money: TypeAlias = float  # USD amount
 Percentage: TypeAlias = float  # 0.0 to 1.0
 ```
 
 ## Usage Examples
 
-### Example 1: Basic Analysis Flow
+### Example 1: Complete Analysis with Live API Data
 
 ```python
-from healthplan_navigator import HealthPlanAnalyzer, Client
+from healthplan_navigator.analyzer import HealthPlanAnalyzer
+from healthplan_navigator.core.models import Client, PersonalInfo, MedicalProfile, Priorities, Provider, Medication, Priority
 
-# Load client profile
-client = Client.from_json("sample_client.json")
+# Create comprehensive client profile
+personal = PersonalInfo(
+    full_name="Jane Smith",
+    dob="1978-06-15",
+    zipcode="85001",
+    household_size=3,
+    annual_income=85000,
+    csr_eligible=False
+)
 
-# Create analyzer
-analyzer = HealthPlanAnalyzer(client)
+medical = MedicalProfile(
+    providers=[
+        Provider(
+            name="Dr. Sarah Chen, MD",
+            specialty="Primary Care",
+            priority=Priority.MUST_KEEP,
+            visit_frequency=4
+        ),
+        Provider(
+            name="Dr. Michael Rodriguez, MD", 
+            specialty="Cardiology",
+            priority=Priority.MUST_KEEP,
+            visit_frequency=2
+        )
+    ],
+    medications=[
+        Medication(
+            name="Metformin",
+            dosage="500mg",
+            frequency="Twice daily",
+            annual_doses=730
+        ),
+        Medication(
+            name="Lisinopril",
+            dosage="10mg",
+            frequency="Daily",
+            annual_doses=365
+        )
+    ]
+)
 
-# Add plans from directory
-analyzer.add_plans_from_directory("./personal_documents/")
+priorities = Priorities(
+    keep_providers=5,  # Highest priority
+    minimize_total_cost=4,
+    predictable_costs=3,
+    avoid_prior_auth=4,
+    simple_admin=3
+)
 
-# Run analysis
-results = analyzer.analyze()
+client = Client(personal=personal, medical_profile=medical, priorities=priorities)
 
-# Generate reports
-analyzer.generate_reports("./output/analysis_2024-01-15/")
+# Initialize analyzer with API keys
+analyzer = HealthPlanAnalyzer(
+    output_dir="./analysis_results",
+    api_keys={
+        'healthcare_gov': 'your_api_key',  # Optional
+        'goodrx': 'your_goodrx_key'  # Optional
+    }
+)
 
-# Access results programmatically
-top_plan = results.get_top_plan()
-print(f"Recommended: {top_plan.plan.marketing_name}")
-print(f"Score: {top_plan.metrics.weighted_total_score:.1f}/10")
-print(f"Annual cost: ${top_plan.cost_breakdown.total_annual_cost:,.0f}")
+# Run analysis with live API data
+report = analyzer.analyze(
+    client=client,
+    healthcare_gov_fetch=True,  # Fetch from Healthcare.gov
+    formats=['summary', 'csv', 'json', 'html']
+)
+
+# Access results
+print(f"Analyzed {len(report.plan_analyses)} plans")
+print(f"Top recommendation: {report.plan_analyses[0].plan.marketing_name}")
+print(f"Score: {report.plan_analyses[0].metrics.weighted_total_score:.1f}/10")
+print(f"Estimated annual cost: ${report.plan_analyses[0].estimated_annual_cost:,.0f}")
+
+# Check provider coverage
+top_plan = report.plan_analyses[0]
+for provider in client.medical_profile.providers:
+    in_network = top_plan.plan.provider_network and \
+                 any(provider.name in p for p in top_plan.plan.provider_network.providers)
+    print(f"{provider.name}: {'✅ In-Network' if in_network else '❌ Out-of-Network'}")
 ```
 
-### Example 2: Custom Scoring Weights
+### Example 2: API Integration Testing
 
 ```python
-from healthplan_navigator import HealthPlanAnalyzer, HealthPlanScorer, Client
+from healthplan_navigator.analyzer import HealthPlanAnalyzer
 
-# Create custom scorer emphasizing provider network
-custom_weights = {
-    'provider_network': 0.40,      # Increased from 0.30
-    'medication_coverage': 0.20,   # Decreased from 0.25
-    'total_cost': 0.20,           # Same
-    'financial_protection': 0.10,  # Same
-    'administrative_simplicity': 0.05,  # Decreased from 0.10
+# Test API connectivity
+analyzer = HealthPlanAnalyzer()
+
+print("API Integration Status:")
+print("-" * 40)
+
+# Healthcare.gov API
+hc_status = analyzer.healthcare_gov_api.validate_api_access()
+print(f"Healthcare.gov: {'✅ Connected' if hc_status else '🔑 API Key Required'}")
+
+# Test provider search (NPPES - public API)
+providers = analyzer.provider_integration.search_providers(
+    specialty="Primary Care",
+    location="85001"
+)
+print(f"NPPES Registry: ✅ Found {len(providers)} providers")
+
+# Test medication lookup (RxNorm - public API)
+from healthplan_navigator.core.models import Medication
+med = Medication(name="Lipitor", dosage="20mg", frequency="Daily", annual_doses=365)
+alternatives = analyzer.medication_integration.find_generic_alternatives(med)
+print(f"RxNorm Database: ✅ Found {len(alternatives)} alternatives")
+
+# Test with fallback data
+print("\nFallback Mechanisms:")
+plans = analyzer.healthcare_gov_api.fetch_plans(zipcode="85001")
+print(f"CMS Public Data: {'✅ Available' if plans else '❌ Not Available'}")
+```
+
+### Example 3: Custom Scoring Strategy
+
+```python
+from healthplan_navigator.analyzer import HealthPlanAnalyzer
+from healthplan_navigator.core.score import HealthPlanScorer
+
+# Create scorer with custom weights for cost-conscious analysis
+cost_focused_weights = {
+    'provider_network': 0.20,      # Reduced from 0.30
+    'medication_coverage': 0.20,   # Reduced from 0.25
+    'total_cost': 0.35,           # Increased from 0.20
+    'financial_protection': 0.15,  # Increased from 0.10
+    'administrative_simplicity': 0.05,  # Reduced from 0.10
     'plan_quality': 0.05          # Same
 }
 
-scorer = HealthPlanScorer(weights=custom_weights)
+# Validate weights sum to 1.0
+assert abs(sum(cost_focused_weights.values()) - 1.0) < 0.001
 
-# Use custom scorer in analysis
-analyzer = HealthPlanAnalyzer(client, scorer=scorer)
-```
+# Create custom scorer
+custom_scorer = HealthPlanScorer(weights=cost_focused_weights)
 
-### Example 3: Programmatic Plan Creation
+# Use in analysis
+analyzer = HealthPlanAnalyzer()
+analyzer.engine.scorer = custom_scorer
 
-```python
-from healthplan_navigator.core.models import Plan
-
-# Create plan manually (useful for testing or API integration)
-plan = Plan(
-    plan_id="CUSTOM-001",
-    issuer="Custom Insurance Co",
-    marketing_name="Custom Gold HMO",
-    plan_type="HMO",
-    metal_level="Gold",
-    monthly_premium=475.00,
-    deductible_individual=1500.00,
-    oop_max_individual=6000.00,
-    copay_primary=25.00,
-    copay_specialist=50.00,
-    copay_emergency=300.00,
-    coinsurance=0.20,
-    network_providers=["Dr. Smith", "Dr. Jones", "Medical Center"],
-    formulary={
-        "Metformin": "generic",
-        "Lisinopril": "generic",
-        "Insulin": "preferred"
-    },
-    requires_referral=True,
-    star_rating=4.0
+# Run analysis with cost focus
+report = analyzer.analyze(
+    client=client,
+    plan_sources="./documents/",
+    formats=['summary']
 )
 
-# Add to analyzer
-analyzer.add_plan(plan)
+print("Cost-Focused Analysis Results:")
+for i, analysis in enumerate(report.plan_analyses[:3], 1):
+    print(f"{i}. {analysis.plan.marketing_name}")
+    print(f"   Cost Score: {analysis.metrics.total_cost_score:.1f}/10")
+    print(f"   Annual Cost: ${analysis.estimated_annual_cost:,.0f}")
 ```
 
-### Example 4: Batch Processing Multiple Clients
+### Example 4: Batch Processing with Parallel Execution
 
 ```python
-import os
 from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
+import json
 
-def analyze_client(client_file: str, plans_dir: str, output_base: str):
-    """Analyze plans for a single client"""
+def analyze_client_profile(client_file: str, output_dir: str):
+    """Analyze plans for a single client."""
+    from healthplan_navigator.analyzer import HealthPlanAnalyzer
+    from healthplan_navigator.core.models import Client
     
-    # Create output directory
-    client_name = os.path.splitext(os.path.basename(client_file))[0]
-    output_dir = os.path.join(output_base, client_name)
+    # Load client
+    with open(client_file, 'r') as f:
+        client_data = json.load(f)
+    client = Client.from_dict(client_data['client'])
     
-    # Run analysis
-    analyzer = HealthPlanAnalyzer.from_file(client_file)
-    analyzer.add_plans_from_directory(plans_dir)
-    results = analyzer.analyze()
-    analyzer.generate_reports(output_dir)
+    # Initialize analyzer
+    analyzer = HealthPlanAnalyzer(output_dir=output_dir)
     
-    return client_name, results.get_top_plan().plan.marketing_name
+    # Run analysis with API data
+    report = analyzer.analyze(
+        client=client,
+        healthcare_gov_fetch=True,
+        formats=['summary', 'csv']
+    )
+    
+    return {
+        'client': Path(client_file).stem,
+        'plans_analyzed': len(report.plan_analyses),
+        'top_plan': report.plan_analyses[0].plan.marketing_name,
+        'score': report.plan_analyses[0].metrics.weighted_total_score
+    }
 
 # Process multiple clients in parallel
-client_files = ["client1.json", "client2.json", "client3.json"]
-plans_dir = "./shared_plans/"
-output_base = "./batch_output/"
+client_files = list(Path('./clients/').glob('*.json'))
 
-with ProcessPoolExecutor(max_workers=3) as executor:
+with ProcessPoolExecutor(max_workers=4) as executor:
     futures = [
-        executor.submit(analyze_client, cf, plans_dir, output_base)
+        executor.submit(analyze_client_profile, str(cf), f"./output/{cf.stem}/")
         for cf in client_files
     ]
     
-    for future in futures:
-        client_name, best_plan = future.result()
-        print(f"{client_name}: {best_plan}")
-```
-
-### Example 5: Integration with External APIs
-
-```python
-import requests
-from healthplan_navigator.core.models import Plan
-
-class APIPlansLoader:
-    """Load plans from external API"""
+    results = [future.result() for future in futures]
     
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.base_url = "https://api.healthplans.com/v1"
-    
-    def load_plans_for_zip(self, zipcode: str) -> List[Plan]:
-        """Load available plans for a ZIP code"""
-        
-        response = requests.get(
-            f"{self.base_url}/plans",
-            params={"zipcode": zipcode},
-            headers={"Authorization": f"Bearer {self.api_key}"}
-        )
-        
-        plans = []
-        for plan_data in response.json()["plans"]:
-            plan = Plan(
-                plan_id=plan_data["id"],
-                issuer=plan_data["issuer"],
-                marketing_name=plan_data["name"],
-                # Map remaining fields...
-            )
-            plans.append(plan)
-        
-        return plans
-
-# Use with analyzer
-loader = APIPlansLoader("your-api-key")
-plans = loader.load_plans_for_zip("85001")
-
-analyzer = HealthPlanAnalyzer(client)
-for plan in plans:
-    analyzer.add_plan(plan)
+# Summary report
+print("Batch Analysis Complete:")
+print("-" * 50)
+for result in results:
+    print(f"Client: {result['client']}")
+    print(f"  Plans Analyzed: {result['plans_analyzed']}")
+    print(f"  Recommendation: {result['top_plan']} ({result['score']:.1f}/10)")
+    print()
 ```
 
 ## Error Handling
 
-### Common Exceptions
+### Comprehensive Error Management
 
 ```python
-# File not found
-try:
-    plan = parser.parse_document("missing.pdf")
-except IOError as e:
-    print(f"File error: {e}")
+from healthplan_navigator.analyzer import HealthPlanAnalyzer
+import logging
 
-# Invalid file format
-try:
-    plan = parser.parse_document("file.xyz")
-except ValueError as e:
-    print(f"Format error: {e}")
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# No plans to analyze
-try:
-    results = analyzer.analyze()
-except ValueError as e:
-    print(f"Analysis error: {e}")
-
-# Invalid weights
-try:
-    scorer = HealthPlanScorer(weights={'invalid': 1.0})
-except ValueError as e:
-    print(f"Configuration error: {e}")
+def safe_analysis_with_fallbacks(client, documents_dir):
+    """
+    Perform analysis with comprehensive error handling and fallbacks.
+    """
+    analyzer = HealthPlanAnalyzer()
+    report = None
+    
+    try:
+        # Try live API first
+        logger.info("Attempting Healthcare.gov API fetch...")
+        report = analyzer.analyze(
+            client=client,
+            healthcare_gov_fetch=True,
+            formats=['summary']
+        )
+        logger.info(f"Success: Analyzed {len(report.plan_analyses)} plans from API")
+        
+    except Exception as api_error:
+        logger.warning(f"API fetch failed: {api_error}")
+        logger.info("Falling back to local documents...")
+        
+        try:
+            # Fallback to local documents
+            report = analyzer.analyze(
+                client=client,
+                plan_sources=documents_dir,
+                formats=['summary']
+            )
+            logger.info(f"Success: Analyzed {len(report.plan_analyses)} local plans")
+            
+        except Exception as local_error:
+            logger.error(f"Local analysis also failed: {local_error}")
+            
+            # Last resort - return error report
+            return {
+                'status': 'error',
+                'errors': [str(api_error), str(local_error)],
+                'recommendation': 'Please check plan documents and try again'
+            }
+    
+    return {
+        'status': 'success',
+        'report': report,
+        'top_plan': report.plan_analyses[0] if report.plan_analyses else None
+    }
 ```
 
-### Error Recovery Patterns
+### API-Specific Error Handling
 
 ```python
-def safe_parse_directory(directory: str) -> List[Plan]:
-    """Parse directory with error recovery"""
+from healthplan_navigator.integrations.healthcare_gov import HealthcareGovAPI
+import time
+
+class RobustHealthcareGovAPI(HealthcareGovAPI):
+    """
+    Enhanced API client with robust error handling and retries.
+    """
     
-    plans = []
-    failed_files = []
-    
-    for file_path in glob.glob(os.path.join(directory, "*")):
-        try:
-            plan = parser.parse_document(file_path)
-            if plan:
-                plans.append(plan)
-        except Exception as e:
-            failed_files.append((file_path, str(e)))
-            continue
-    
-    if failed_files:
-        print(f"Failed to parse {len(failed_files)} files:")
-        for path, error in failed_files:
-            print(f"  - {path}: {error}")
-    
-    return plans
+    def fetch_plans_with_retry(self, zipcode: str, max_retries: int = 3):
+        """
+        Fetch plans with exponential backoff retry strategy.
+        """
+        for attempt in range(max_retries):
+            try:
+                plans = self.fetch_plans(zipcode)
+                if plans:
+                    return plans
+                    
+            except Exception as e:
+                wait_time = 2 ** attempt  # Exponential backoff
+                logger.warning(f"Attempt {attempt + 1} failed: {e}")
+                
+                if attempt < max_retries - 1:
+                    logger.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    logger.error("All retry attempts exhausted")
+                    raise
+        
+        return []
 ```
 
 ## Extension Guide
 
-### Adding a New Scoring Metric
+### Adding Custom Metrics
 
 ```python
-# Step 1: Extend ScoringMetrics
+from dataclasses import dataclass
+from healthplan_navigator.core.models import ScoringMetrics
+from healthplan_navigator.core.score import HealthPlanScorer
+
 @dataclass
-class ExtendedScoringMetrics(ScoringMetrics):
-    """Extended metrics including telehealth"""
+class ExtendedMetrics(ScoringMetrics):
+    """Extended metrics including telehealth and mental health coverage."""
     telehealth_score: float = 0.0
+    mental_health_score: float = 0.0
 
-# Step 2: Extend Plan model if needed
-@dataclass
-class ExtendedPlan(Plan):
-    """Plan with telehealth information"""
-    offers_telehealth: bool = False
-    telehealth_copay: float = 0.0
-
-# Step 3: Create custom scorer
 class ExtendedScorer(HealthPlanScorer):
-    """Scorer with telehealth metric"""
+    """Enhanced scorer with additional metrics."""
     
     DEFAULT_WEIGHTS = {
         'provider_network': 0.25,
         'medication_coverage': 0.20,
-        'total_cost': 0.20,
+        'total_cost': 0.15,
         'financial_protection': 0.10,
         'administrative_simplicity': 0.10,
         'plan_quality': 0.05,
-        'telehealth': 0.10  # New metric
+        'telehealth': 0.10,  # New
+        'mental_health': 0.05  # New
     }
     
-    def _score_telehealth(self, plan: ExtendedPlan) -> float:
-        """Score telehealth coverage (0-10)"""
-        if not plan.offers_telehealth:
-            return 0.0
+    def _score_telehealth(self, plan: Plan) -> float:
+        """Score telehealth coverage (0-10)."""
+        score = 0.0
         
-        score = 5.0  # Base score for offering
+        # Check for telehealth offerings
+        if hasattr(plan, 'offers_telehealth') and plan.offers_telehealth:
+            score += 5.0
+            
+            # Bonus for low/no copay
+            if hasattr(plan, 'telehealth_copay'):
+                if plan.telehealth_copay == 0:
+                    score += 5.0
+                elif plan.telehealth_copay <= 25:
+                    score += 3.0
+                else:
+                    score += 1.0
         
-        if plan.telehealth_copay == 0:
-            score += 3.0  # Free telehealth
-        elif plan.telehealth_copay <= 25:
-            score += 2.0  # Low cost
+        return min(score, 10.0)
+    
+    def _score_mental_health(self, plan: Plan) -> float:
+        """Score mental health coverage (0-10)."""
+        score = 5.0  # Base score
         
-        return min(score + 2.0, 10.0)  # Bonus points
+        # Check for mental health benefits
+        if hasattr(plan, 'mental_health_copay'):
+            if plan.mental_health_copay <= plan.copay_primary:
+                score += 3.0  # Mental health parity
+            
+            if plan.mental_health_copay <= 50:
+                score += 2.0  # Affordable access
+        
+        return min(score, 10.0)
 ```
 
-### Creating a Custom Parser
+### Custom API Integration
 
 ```python
-from healthplan_navigator.core.ingest import DocumentParser
+from typing import List, Optional
+import requests
 
-class ExcelParser:
-    """Parser for Excel files"""
+class CustomInsuranceAPI:
+    """
+    Integration with a custom insurance provider API.
+    """
     
-    def parse(self, file_path: str) -> List[Plan]:
-        """Parse Excel file with multiple plans"""
-        import pandas as pd
+    def __init__(self, api_key: str, base_url: str):
+        self.api_key = api_key
+        self.base_url = base_url
+        self.session = requests.Session()
+        self.session.headers.update({
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        })
+    
+    def fetch_provider_plans(self, provider_id: str) -> List[Plan]:
+        """
+        Fetch plans from a specific insurance provider.
+        """
+        response = self.session.get(
+            f"{self.base_url}/providers/{provider_id}/plans",
+            timeout=30
+        )
         
-        df = pd.read_excel(file_path)
+        if response.status_code == 200:
+            return self._transform_to_plans(response.json())
+        else:
+            raise Exception(f"API error: {response.status_code}")
+    
+    def _transform_to_plans(self, api_data: dict) -> List[Plan]:
+        """Transform API response to Plan objects."""
         plans = []
         
-        for _, row in df.iterrows():
+        for plan_data in api_data.get('plans', []):
             plan = Plan(
-                plan_id=row['Plan ID'],
-                issuer=row['Issuer'],
-                marketing_name=row['Plan Name'],
-                # Map remaining columns...
+                plan_id=plan_data['id'],
+                issuer=plan_data['carrier'],
+                marketing_name=plan_data['name'],
+                plan_type=PlanType[plan_data['type'].upper()],
+                metal_level=MetalLevel[plan_data['tier'].upper()],
+                monthly_premium=float(plan_data['premium']),
+                deductible=float(plan_data['deductible']),
+                oop_max=float(plan_data['oop_max']),
+                # Map additional fields...
             )
             plans.append(plan)
         
         return plans
-
-# Register with DocumentParser
-class ExtendedDocumentParser(DocumentParser):
-    """Parser with Excel support"""
-    
-    def __init__(self):
-        super().__init__()
-        self.excel_parser = ExcelParser()
-    
-    def parse_document(self, file_path: str) -> Optional[Plan]:
-        if file_path.endswith('.xlsx'):
-            plans = self.excel_parser.parse(file_path)
-            return plans[0] if plans else None
-        return super().parse_document(file_path)
 ```
 
-### Custom Report Format
+## Performance Optimization
 
-```python
-class LatexReportGenerator:
-    """Generate LaTeX reports for professional printing"""
-    
-    def generate_latex_report(self, results: AnalysisResults, 
-                            output_dir: str) -> str:
-        """Generate professional LaTeX report"""
-        
-        output_path = os.path.join(output_dir, "report.tex")
-        
-        with open(output_path, 'w') as f:
-            # LaTeX header
-            f.write("\\documentclass{article}\n")
-            f.write("\\usepackage{booktabs}\n")
-            f.write("\\begin{document}\n")
-            f.write("\\title{Healthcare Plan Analysis}\n")
-            f.write(f"\\author{{{results.client.personal.full_name}}}\n")
-            f.write("\\maketitle\n\n")
-            
-            # Content sections
-            self._write_summary_section(f, results)
-            self._write_comparison_table(f, results)
-            self._write_recommendations(f, results)
-            
-            # Close document
-            f.write("\\end{document}\n")
-        
-        return output_path
-```
-
-## API Patterns
-
-### Builder Pattern for Complex Objects
-
-```python
-class ClientBuilder:
-    """Fluent builder for Client objects"""
-    
-    def __init__(self):
-        self._personal = None
-        self._providers = []
-        self._medications = []
-        self._priorities = None
-    
-    def with_personal_info(self, **kwargs) -> 'ClientBuilder':
-        self._personal = PersonalInfo(**kwargs)
-        return self
-    
-    def add_provider(self, **kwargs) -> 'ClientBuilder':
-        self._providers.append(Provider(**kwargs))
-        return self
-    
-    def add_medication(self, **kwargs) -> 'ClientBuilder':
-        self._medications.append(Medication(**kwargs))
-        return self
-    
-    def with_priorities(self, **kwargs) -> 'ClientBuilder':
-        self._priorities = Priorities(**kwargs)
-        return self
-    
-    def build(self) -> Client:
-        """Build the client object"""
-        if not all([self._personal, self._priorities]):
-            raise ValueError("Missing required components")
-        
-        medical_profile = MedicalProfile(
-            providers=self._providers,
-            medications=self._medications
-        )
-        
-        return Client(
-            personal=self._personal,
-            medical_profile=medical_profile,
-            priorities=self._priorities
-        )
-
-# Usage
-client = (ClientBuilder()
-    .with_personal_info(
-        full_name="John Doe",
-        dob="1980-01-01",
-        zipcode="85001",
-        household_size=2,
-        annual_income=75000,
-        csr_eligible=False
-    )
-    .add_provider(
-        name="Dr. Smith",
-        specialty="Primary Care",
-        priority="must-keep",
-        visit_frequency=4
-    )
-    .add_medication(
-        name="Metformin",
-        dosage="500mg",
-        frequency="Daily",
-        annual_doses=365
-    )
-    .with_priorities(
-        keep_providers=5,
-        minimize_total_cost=4,
-        predictable_costs=3,
-        avoid_prior_auth=4,
-        simple_admin=3
-    )
-    .build()
-)
-```
-
-### Strategy Pattern for Scoring
-
-```python
-from abc import ABC, abstractmethod
-
-class ScoringStrategy(ABC):
-    """Abstract base for scoring strategies"""
-    
-    @abstractmethod
-    def score(self, client: Client, plan: Plan) -> float:
-        """Calculate score for a specific metric"""
-        pass
-
-class ProviderNetworkStrategy(ScoringStrategy):
-    """Strategy for provider network scoring"""
-    
-    def score(self, client: Client, plan: Plan) -> float:
-        # Implementation here
-        pass
-
-class CostFocusedScorer(HealthPlanScorer):
-    """Scorer using strategy pattern"""
-    
-    def __init__(self):
-        self.strategies = {
-            'provider_network': ProviderNetworkStrategy(),
-            'total_cost': TotalCostStrategy(),
-            # etc...
-        }
-```
-
-## Performance Considerations
-
-### Caching Expensive Operations
+### Caching Strategy
 
 ```python
 from functools import lru_cache
+from typing import Tuple
 import hashlib
+import pickle
 
-class CachedHealthPlanScorer(HealthPlanScorer):
-    """Scorer with caching for repeated calculations"""
+class CachedAnalyzer(HealthPlanAnalyzer):
+    """
+    Analyzer with intelligent caching for repeated operations.
+    """
     
-    @lru_cache(maxsize=128)
-    def _estimate_annual_cost(self, client_hash: str, plan_id: str) -> float:
-        """Cached cost estimation"""
-        # Reconstruct objects from cache keys
-        client = self._get_client_from_hash(client_hash)
-        plan = self._get_plan_from_id(plan_id)
-        return super()._estimate_annual_cost(client, plan)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._score_cache = {}
+        self._api_cache = {}
     
-    def _get_client_hash(self, client: Client) -> str:
-        """Generate stable hash for client"""
-        data = f"{client.personal.full_name}:{len(client.medical_profile.medications)}"
-        return hashlib.md5(data.encode()).hexdigest()
+    def _get_cache_key(self, client: Client, plan: Plan) -> str:
+        """Generate stable cache key for client-plan pair."""
+        # Create hashable representation
+        client_str = f"{client.personal.zipcode}:{len(client.medical_profile.providers)}:{len(client.medical_profile.medications)}"
+        plan_str = f"{plan.plan_id}:{plan.monthly_premium}:{plan.deductible}"
+        combined = f"{client_str}|{plan_str}"
+        return hashlib.md5(combined.encode()).hexdigest()
+    
+    @lru_cache(maxsize=256)
+    def _cached_score_plan(self, cache_key: str) -> PlanAnalysis:
+        """Cached scoring with LRU eviction."""
+        # Reconstruct objects from cache key (simplified)
+        # In production, store serialized objects
+        return self.engine.scorer.score_plan(...)
+    
+    def analyze(self, client: Client, **kwargs) -> AnalysisReport:
+        """Analyze with caching."""
+        # Check if we've analyzed this exact client recently
+        client_hash = self._get_client_hash(client)
+        
+        if client_hash in self._api_cache:
+            cached_data = self._api_cache[client_hash]
+            age = time.time() - cached_data['timestamp']
+            
+            if age < 3600:  # 1 hour cache
+                logger.info("Using cached analysis results")
+                return cached_data['report']
+        
+        # Perform analysis
+        report = super().analyze(client, **kwargs)
+        
+        # Cache results
+        self._api_cache[client_hash] = {
+            'report': report,
+            'timestamp': time.time()
+        }
+        
+        return report
 ```
 
 ### Parallel Processing
 
 ```python
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import asyncio
 
 class ParallelAnalyzer(HealthPlanAnalyzer):
-    """Analyzer with parallel plan scoring"""
+    """
+    Analyzer with parallel processing capabilities.
+    """
     
-    def analyze(self) -> AnalysisResults:
-        """Analyze plans in parallel"""
+    def analyze_parallel(self, client: Client, plan_sources: List[str]) -> AnalysisReport:
+        """
+        Analyze multiple plan sources in parallel.
+        """
+        plans = []
         
+        # Parse documents in parallel
         with ThreadPoolExecutor(max_workers=5) as executor:
-            # Score plans in parallel
-            futures = [
-                executor.submit(self.scorer.score_plan, self.client, plan, self.plans)
-                for plan in self.plans
-            ]
+            futures = {
+                executor.submit(self.parser.parse_document, source): source
+                for source in plan_sources
+            }
             
-            analyses = [future.result() for future in futures]
+            for future in as_completed(futures):
+                try:
+                    plan = future.result(timeout=10)
+                    if plan:
+                        plans.append(plan)
+                except Exception as e:
+                    logger.error(f"Failed to parse {futures[future]}: {e}")
         
-        # Rest of analysis...
-        return self._complete_analysis(analyses)
+        # Score plans in parallel
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            score_futures = {
+                executor.submit(self.engine.scorer.score_plan, client, plan, plans): plan
+                for plan in plans
+            }
+            
+            analyses = []
+            for future in as_completed(score_futures):
+                try:
+                    analysis = future.result(timeout=5)
+                    analyses.append(analysis)
+                except Exception as e:
+                    logger.error(f"Failed to score plan: {e}")
+        
+        # Sort and create report
+        analyses.sort(key=lambda a: a.metrics.weighted_total_score, reverse=True)
+        
+        return AnalysisReport(
+            client=client,
+            plan_analyses=analyses,
+            generated_at=datetime.now()
+        )
 ```
 
-### Memory-Efficient Processing
+### Memory-Efficient Streaming
 
 ```python
-class StreamingAnalyzer:
-    """Process large plan sets without loading all into memory"""
+from typing import Generator
+import gc
+
+class StreamingAnalyzer(HealthPlanAnalyzer):
+    """
+    Memory-efficient analyzer for large datasets.
+    """
     
-    def analyze_streaming(self, plan_files: List[str]) -> Generator[PlanAnalysis, None, None]:
-        """Yield analysis results one at a time"""
+    def analyze_streaming(self, 
+                         client: Client,
+                         plan_sources: List[str],
+                         batch_size: int = 10) -> Generator[PlanAnalysis, None, None]:
+        """
+        Stream analysis results to minimize memory usage.
         
-        for plan_file in plan_files:
-            # Parse one plan
-            plan = self.parser.parse_document(plan_file)
-            if not plan:
-                continue
+        Processes plans in batches and yields results immediately,
+        allowing garbage collection between batches.
+        """
+        for i in range(0, len(plan_sources), batch_size):
+            batch = plan_sources[i:i + batch_size]
             
-            # Score it
-            analysis = self.scorer.score_plan(self.client, plan, [plan])
+            # Process batch
+            plans = []
+            for source in batch:
+                plan = self.parser.parse_document(source)
+                if plan:
+                    plans.append(plan)
             
-            # Yield result
-            yield analysis
+            # Score and yield
+            for plan in plans:
+                analysis = self.engine.scorer.score_plan(client, plan, plans)
+                yield analysis
             
-            # Plan object will be garbage collected
+            # Clear batch from memory
+            del plans
+            gc.collect()
+    
+    def generate_streaming_report(self, analyses: Generator) -> None:
+        """
+        Generate report from streaming results.
+        """
+        # Write header
+        with open('streaming_report.csv', 'w') as f:
+            f.write('Plan Name,Score,Annual Cost\n')
+            
+            # Process results as they arrive
+            for analysis in analyses:
+                f.write(f"{analysis.plan.marketing_name},")
+                f.write(f"{analysis.metrics.weighted_total_score:.1f},")
+                f.write(f"{analysis.estimated_annual_cost:.0f}\n")
+```
+
+## API Integration Patterns
+
+### Resilient API Client Pattern
+
+```python
+from typing import Optional, Callable
+import functools
+
+def with_fallback(fallback_func: Callable):
+    """
+    Decorator for API methods with automatic fallback.
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+                if result:
+                    return result
+            except Exception as e:
+                logger.warning(f"{func.__name__} failed: {e}")
+            
+            # Use fallback
+            logger.info(f"Using fallback for {func.__name__}")
+            return fallback_func(*args, **kwargs)
+        
+        return wrapper
+    return decorator
+
+class ResilientHealthcareAPI:
+    """
+    API client with automatic fallbacks and resilience patterns.
+    """
+    
+    @with_fallback(lambda self, zip: self._fetch_cached_plans(zip))
+    def fetch_plans(self, zipcode: str) -> List[Plan]:
+        """Fetch with automatic cache fallback."""
+        # Try live API
+        return self._fetch_live_plans(zipcode)
+    
+    def _fetch_cached_plans(self, zipcode: str) -> List[Plan]:
+        """Fallback to cached data."""
+        cache_file = self.cache_dir / f"plans_{zipcode}.json"
+        if cache_file.exists():
+            with open(cache_file, 'r') as f:
+                return self._transform_to_plans(json.load(f))
+        return []
+    
+    @with_fallback(lambda self: False)
+    def validate_api_access(self) -> bool:
+        """Validate with graceful failure."""
+        response = self.session.get(f"{self.base_url}/health", timeout=5)
+        return response.status_code == 200
+```
+
+### Circuit Breaker Pattern
+
+```python
+from enum import Enum
+import time
+
+class CircuitState(Enum):
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"      # Failing, skip calls
+    HALF_OPEN = "half_open"  # Testing recovery
+
+class CircuitBreaker:
+    """
+    Circuit breaker for API calls to prevent cascading failures.
+    """
+    
+    def __init__(self, failure_threshold: int = 5, recovery_timeout: int = 60):
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = CircuitState.CLOSED
+    
+    def call(self, func: Callable, *args, **kwargs):
+        """
+        Execute function with circuit breaker protection.
+        """
+        if self.state == CircuitState.OPEN:
+            if self._should_attempt_reset():
+                self.state = CircuitState.HALF_OPEN
+            else:
+                raise Exception("Circuit breaker is OPEN")
+        
+        try:
+            result = func(*args, **kwargs)
+            self._on_success()
+            return result
+            
+        except Exception as e:
+            self._on_failure()
+            raise e
+    
+    def _should_attempt_reset(self) -> bool:
+        """Check if enough time has passed to retry."""
+        return (
+            self.last_failure_time and
+            time.time() - self.last_failure_time >= self.recovery_timeout
+        )
+    
+    def _on_success(self):
+        """Reset circuit breaker on success."""
+        self.failure_count = 0
+        self.state = CircuitState.CLOSED
+    
+    def _on_failure(self):
+        """Handle failure and potentially open circuit."""
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        
+        if self.failure_count >= self.failure_threshold:
+            self.state = CircuitState.OPEN
+            logger.warning("Circuit breaker opened due to repeated failures")
 ```
 
 ---
 
-This comprehensive API documentation provides complete details for all classes, methods, patterns, and usage examples in the HealthPlan Navigator system. It serves as the definitive reference for developers and AI coding assistants working with the codebase.
+## 📚 Complete API Reference Summary
+
+This comprehensive API documentation for HealthPlan Navigator v1.1.0 provides:
+
+- **Complete Module Documentation**: Every class, method, and attribute
+- **Live API Integration**: Healthcare.gov, NPPES, RxNorm, GoodRx
+- **Type Safety**: Extensive type hints and enumerations
+- **Real-World Examples**: Production-ready code samples
+- **Error Handling**: Comprehensive error management strategies
+- **Performance Patterns**: Caching, parallel processing, streaming
+- **Extension Guide**: How to add custom metrics and integrations
+- **Best Practices**: Circuit breakers, fallbacks, resilience patterns
+
+The system is **production-ready** with intelligent fallbacks ensuring functionality even without API keys, while providing enhanced capabilities when live data sources are available.
