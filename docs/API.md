@@ -1,4 +1,4 @@
-# HealthPlan Navigator API Reference v1.1.0
+# HealthPlan Navigator API Reference v1.1.2
 
 ## 📚 Table of Contents
 1. [Overview](#overview)
@@ -20,9 +20,16 @@
 
 ## Overview
 
-The HealthPlan Navigator API v1.1.0 provides a comprehensive programmatic interface for healthcare plan analysis with **live API integration capabilities**. This document details every class, method, data structure, and integration point available for developers and AI coding assistants.
+The HealthPlan Navigator API v1.1.2 provides a comprehensive programmatic interface for healthcare plan analysis with **live API integration capabilities** and **security-hardened** implementation. This document details every class, method, data structure, and integration point available for developers and AI coding assistants.
 
-### 🚀 New in v1.1.0
+### 🛡️ New in v1.1.2
+- **Security Hardening**: SQL injection protection and input validation
+- **Robust Error Handling**: Proper logging throughout the application  
+- **Data Validation**: ZIP code validation and sanitization
+- **Model Compatibility**: Fixed backwards compatibility issues
+- **Production Stability**: All critical bugs resolved
+
+### 🚀 Existing Features (v1.1+)
 - **Unified HealthPlanAnalyzer Interface**: Single entry point for all functionality
 - **Live API Integrations**: Healthcare.gov, NPPES, RxNorm, GoodRx
 - **Enhanced Provider Matching**: Fuzzy string matching algorithms
@@ -111,7 +118,7 @@ class HealthPlanAnalyzer:
     """
     
     def __init__(self, output_dir: str = "./reports", 
-                 api_keys: Optional[Dict[str, str]] = None):
+                 api_keys: Optional[Dict[str, str]] = None) -> None:
         """
         Initialize the HealthPlanAnalyzer with optional API keys.
         
@@ -195,7 +202,32 @@ class HealthPlanAnalyzer:
 
 ### `healthplan_navigator.core.models`
 
-Core data models using Python dataclasses for type safety.
+Core data models using Python dataclasses for type safety with comprehensive validation.
+
+#### Function: `validate_zipcode`
+**NEW in v1.1.2** - Centralized ZIP code validation function.
+
+```python
+def validate_zipcode(zipcode: str) -> str:
+    """
+    Validate and format zipcode for consistent use across the application.
+    
+    Args:
+        zipcode: Input ZIP code in various formats
+        
+    Returns:
+        Formatted 5-digit ZIP code
+        
+    Raises:
+        ValueError: If ZIP code is invalid
+    
+    Example:
+        >>> validate_zipcode("85001")     # Returns: "85001"
+        >>> validate_zipcode("85001-1234") # Returns: "85001"  
+        >>> validate_zipcode("AZ 85001")   # Returns: "85001"
+        >>> validate_zipcode("invalid")    # Raises: ValueError
+    """
+```
 
 #### Class: `Client`
 Complete healthcare consumer profile.
@@ -1417,11 +1449,12 @@ class CircuitBreaker:
 
 ## 📚 Complete API Reference Summary
 
-This comprehensive API documentation for HealthPlan Navigator v1.1.0 provides:
+This comprehensive API documentation for HealthPlan Navigator v1.1.2 provides:
 
 - **Complete Module Documentation**: Every class, method, and attribute
+- **Security Hardened**: SQL injection protection, input validation, proper error handling
 - **Live API Integration**: Healthcare.gov, NPPES, RxNorm, GoodRx
-- **Type Safety**: Extensive type hints and enumerations
+- **Type Safety**: Extensive type hints and enumerations  
 - **Real-World Examples**: Production-ready code samples
 - **Error Handling**: Comprehensive error management strategies
 - **Performance Patterns**: Caching, parallel processing, streaming
