@@ -157,10 +157,10 @@ class HealthPlanScorer:
         # Add deductible and estimate unexpected care
         estimated_unexpected = 1000  # Conservative estimate
         
-        total_cost = annual_premium + plan.deductible_individual + visit_costs + medication_costs + estimated_unexpected
+        total_cost = annual_premium + plan.deductible + visit_costs + medication_costs + estimated_unexpected
         
         # Cap at out-of-pocket maximum + premiums
-        true_cost = min(total_cost, plan.oop_max_individual + annual_premium)
+        true_cost = min(total_cost, plan.oop_max + annual_premium)
         
         return true_cost
     
@@ -188,8 +188,9 @@ class HealthPlanScorer:
         - 4 points: Deductible ≤ $2,000 AND OOPM ≤ $7,000
         - 0 points: Higher than above thresholds
         """
-        deductible = plan.deductible_individual
-        oopm = plan.oop_max_individual
+        # Use the unified deductible and oop_max fields (backwards compatibility handled in Plan.__post_init__)
+        deductible = plan.deductible
+        oopm = plan.oop_max
         
         if deductible <= 500 and oopm <= 3000:
             return 10.0

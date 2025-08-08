@@ -83,7 +83,7 @@ This plan offers the best balance of provider access, medication coverage, and t
         
         summary += f"\n### Risk Analysis\n"
         summary += f"- **Best Case Scenario**: ${top_plan.plan.monthly_premium * 12:,.2f} (premiums only)\n"
-        summary += f"- **Worst Case Scenario**: ${top_plan.plan.oop_max_individual + (top_plan.plan.monthly_premium * 12):,.2f} (max out-of-pocket + premiums)\n"
+        summary += f"- **Worst Case Scenario**: ${top_plan.plan.oop_max + (top_plan.plan.monthly_premium * 12):,.2f} (max out-of-pocket + premiums)\n"
         summary += f"- **Expected Cost**: ${top_plan.estimated_annual_cost:,.2f}\n"
         summary += "\n*This analysis is based on your current medical needs and utilization patterns. Actual costs may vary.*"
         
@@ -117,8 +117,8 @@ This plan offers the best balance of provider access, medication coverage, and t
                     'Issuer': analysis.plan.issuer,
                     'Metal Level': analysis.plan.metal_level.value,
                     'Monthly Premium': f"${analysis.plan.monthly_premium:.2f}",
-                    'Deductible': f"${analysis.plan.deductible_individual:,.2f}",
-                    'Out-of-Pocket Max': f"${analysis.plan.oop_max_individual:,.2f}",
+                    'Deductible': f"${analysis.plan.deductible:,.2f}",
+                    'Out-of-Pocket Max': f"${analysis.plan.oop_max:,.2f}",
                     'Estimated Annual Cost': f"${analysis.estimated_annual_cost:,.2f}",
                     'Provider Network Score': f"{analysis.metrics.provider_network_score:.1f}",
                     'Medication Coverage Score': f"{analysis.metrics.medication_coverage_score:.1f}",
@@ -177,8 +177,8 @@ This plan offers the best balance of provider access, medication coverage, and t
                         'marketing_name': analysis.plan.marketing_name,
                         'metal_level': analysis.plan.metal_level.value,
                         'monthly_premium': analysis.plan.monthly_premium,
-                        'deductible_individual': analysis.plan.deductible_individual,
-                        'oop_max_individual': analysis.plan.oop_max_individual
+                        'deductible': analysis.plan.deductible,
+                        'oop_max': analysis.plan.oop_max
                     },
                     'scores': {
                         'provider_network': analysis.metrics.provider_network_score,
