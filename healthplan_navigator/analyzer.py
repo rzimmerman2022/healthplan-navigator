@@ -20,7 +20,7 @@ import json
 import logging
 
 # Core models for client profiles, plans, and analysis results
-from .core.models import Client, Plan, AnalysisReport
+from .core.models import Client, Plan, AnalysisReport, validate_zipcode
 # Document parsing engine supporting multiple formats
 from .core.ingest import DocumentParser
 # Analysis engine with 6-metric scoring system
@@ -214,15 +214,22 @@ class HealthPlanAnalyzer:
         
         try:
             # Extract location from client profile
-            zipcode = getattr(self._current_client.personal_info, 'zipcode', None)
+            zipcode = getattr(self._current_client.personal, 'zipcode', None)
             if not zipcode:
                 logger.warning("Client zipcode not available for plan fetch")
+                return []
+            
+            # Validate the zipcode format
+            try:
+                validated_zipcode = validate_zipcode(zipcode)
+            except ValueError as e:
+                logger.error(f"Invalid client zipcode '{zipcode}': {e}")
                 return []
             
             # Fetch plans using Healthcare.gov API or CMS fallback
             # API automatically handles authentication and fallback
             plans_data = self.healthcare_gov_api.fetch_plans(
-                zipcode=zipcode,
+                zipcode=validated_zipcode,
                 metal_levels=['Bronze', 'Silver', 'Gold', 'Platinum'],
                 plan_types=['HMO', 'PPO', 'EPO', 'POS']
             )
