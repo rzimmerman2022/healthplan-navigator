@@ -2,6 +2,37 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Union
 from enum import Enum
 from datetime import datetime
+import re
+
+
+def validate_zipcode(zipcode: str) -> str:
+    """
+    Validate and format zipcode for consistent use across the application.
+    
+    Args:
+        zipcode: Input ZIP code in various formats
+        
+    Returns:
+        Formatted 5-digit ZIP code
+        
+    Raises:
+        ValueError: If ZIP code is invalid
+    """
+    if not zipcode:
+        raise ValueError("ZIP code is required")
+    
+    # Remove any non-digit characters
+    digits_only = re.sub(r'[^0-9]', '', str(zipcode))
+    
+    # Check for 5-digit ZIP
+    if len(digits_only) == 5:
+        return digits_only
+    
+    # Check for ZIP+4 format - return just the 5-digit portion
+    if len(digits_only) >= 5:
+        return digits_only[:5]
+    
+    raise ValueError(f"Invalid ZIP code format: {zipcode}. Must be at least 5 digits.")
 
 
 class MetalLevel(Enum):
@@ -88,6 +119,20 @@ class PersonalInfo:
     household_size: int
     annual_income: float
     csr_eligible: bool = False
+    
+    def __post_init__(self):
+        """Validate data after initialization."""
+        self.zipcode = self._validate_zipcode(self.zipcode)
+        
+        if self.household_size < 1:
+            raise ValueError("Household size must be at least 1")
+        
+        if self.annual_income < 0:
+            raise ValueError("Annual income cannot be negative")
+    
+    def _validate_zipcode(self, zipcode: str) -> str:
+        """Validate and format zipcode using the global validation function."""
+        return validate_zipcode(zipcode)
 
 
 @dataclass
