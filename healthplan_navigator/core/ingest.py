@@ -1,11 +1,14 @@
 import json
 import csv
 import re
+import logging
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import pdfplumber
 from docx import Document
 from .models import Plan, MetalLevel, PlanType, CoverageStatus, NetworkStatus, CostSharing, Administrative
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentParser:
@@ -46,8 +49,12 @@ class DocumentParser:
                     plan = self.parse_document(str(file_path))
                     if plan:
                         plans.append(plan)
+                        logger.info(f"Successfully parsed plan from {file_path.name}")
+                    else:
+                        logger.warning(f"No plan data extracted from {file_path.name}")
                 except Exception as e:
-                    print(f"Error parsing {file_path}: {e}")
+                    logger.error(f"Error parsing {file_path}: {e}")
+                    # Continue processing other files rather than failing completely
         
         return plans
     
@@ -61,7 +68,7 @@ class DocumentParser:
                 
                 return self._extract_plan_from_text(text, file_path)
         except Exception as e:
-            print(f"Error reading PDF {file_path}: {e}")
+            logger.error(f"Error reading PDF {file_path}: {e}")
             return None
     
     def _parse_docx(self, file_path: str) -> Optional[Plan]:
@@ -74,7 +81,7 @@ class DocumentParser:
             
             return self._extract_plan_from_text(text, file_path)
         except Exception as e:
-            print(f"Error reading DOCX {file_path}: {e}")
+            logger.error(f"Error reading DOCX {file_path}: {e}")
             return None
     
     def parse_json(self, file_path: str) -> Optional[Plan]:
@@ -86,7 +93,7 @@ class DocumentParser:
             # Convert JSON data to Plan object
             return self._json_to_plan(data)
         except Exception as e:
-            print(f"Error reading JSON {file_path}: {e}")
+            logger.error(f"Error reading JSON {file_path}: {e}")
             return None
     
     def parse_csv(self, file_path: str) -> List[Plan]:
@@ -101,7 +108,7 @@ class DocumentParser:
                         plans.append(plan)
             return plans
         except Exception as e:
-            print(f"Error reading CSV {file_path}: {e}")
+            logger.error(f"Error reading CSV {file_path}: {e}")
             return []
     
     def _extract_plan_from_text(self, text: str, source_file: str) -> Optional[Plan]:
@@ -132,7 +139,7 @@ class DocumentParser:
         administrative = self._extract_administrative_details(text)
         
         if not plan_id or not issuer or not metal_level:
-            print(f"Could not extract required plan details from {source_file}")
+            logger.warning(f"Could not extract required plan details from {source_file}")
             return None
         
         return Plan(
@@ -390,5 +397,5 @@ class DocumentParser:
                 customer_rating=float(row.get('customer_rating', 0))
             )
         except Exception as e:
-            print(f"Error converting CSV row to plan: {e}")
+            logger.error(f"Error converting CSV row to plan: {e}")
             return None
