@@ -314,6 +314,18 @@ class HealthcareGovAPI:
         try:
             # Build SQL query for CMS data
             year_val = year or datetime.now().year
+            
+            # Validate and sanitize zipcode
+            if not zipcode or len(zipcode) < 3:
+                logger.warning("Invalid zipcode for CMS query")
+                return {}
+            
+            # Sanitize zipcode - only allow digits and limit to first 3 digits
+            zip_prefix = ''.join(filter(str.isdigit, zipcode))[:3]
+            if not zip_prefix:
+                logger.warning("No valid digits in zipcode")
+                return {}
+            
             query = f"""
             [SELECT 
                 "PlanId" as id,
@@ -331,16 +343,24 @@ class HealthcareGovAPI:
                 "Generic Drugs - Standard" as drug_tier1,
                 "Quality Rating - Global Rating" as quality_rating
             FROM "{self.CMS_DATASET_ID}"
-            WHERE "ServiceAreaId" LIKE '%{zipcode[:3]}%'
+            WHERE "ServiceAreaId" LIKE '%{zip_prefix}%'
             """
             
             if metal_levels:
-                levels_str = "','".join(metal_levels)
-                query += f' AND "MetalLevel" IN (\'{levels_str}\')'
+                # Sanitize metal levels - only allow known values
+                valid_levels = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Catastrophic']
+                safe_levels = [level for level in metal_levels if level in valid_levels]
+                if safe_levels:
+                    levels_str = "','".join(safe_levels)
+                    query += f' AND "MetalLevel" IN (\'{levels_str}\')'
             
             if plan_types:
-                types_str = "','".join(plan_types)
-                query += f' AND "PlanType" IN (\'{types_str}\')'
+                # Sanitize plan types - only allow known values
+                valid_types = ['HMO', 'PPO', 'EPO', 'POS', 'HDHP']
+                safe_types = [ptype for ptype in plan_types if ptype in valid_types]
+                if safe_types:
+                    types_str = "','".join(safe_types)
+                    query += f' AND "PlanType" IN (\'{types_str}\')'
             
             query += " LIMIT 100]"
             
