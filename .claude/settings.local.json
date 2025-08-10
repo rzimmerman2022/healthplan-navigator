@@ -15,7 +15,8 @@
       "Bash(pip install:*)",
       "Bash(rm:*)",
       "WebFetch(domain:github.com)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   },
