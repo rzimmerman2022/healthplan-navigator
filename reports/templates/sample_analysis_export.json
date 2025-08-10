@@ -1,0 +1,1074 @@
+{
+  "metadata": {
+    "generated_at": "2025-08-07T22:53:07.531431",
+    "total_plans_analyzed": 33,
+    "client_name": "Ryan Healthcare Research"
+  },
+  "client_profile": {
+    "personal": {
+      "full_name": "Ryan Healthcare Research",
+      "household_size": 1,
+      "annual_income": 85000,
+      "zipcode": "85001"
+    },
+    "providers": [
+      {
+        "name": "Dr. Sarah Martinez",
+        "specialty": "Primary Care",
+        "priority": "must-keep",
+        "visit_frequency": 2
+      },
+      {
+        "name": "Dr. James Wilson",
+        "specialty": "Cardiology",
+        "priority": "must-keep",
+        "visit_frequency": 2
+      },
+      {
+        "name": "Dr. Emily Chen",
+        "specialty": "Dermatology",
+        "priority": "nice-to-keep",
+        "visit_frequency": 1
+      }
+    ],
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500mg",
+        "frequency": "Daily",
+        "annual_doses": 365
+      },
+      {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "frequency": "Daily",
+        "annual_doses": 365
+      }
+    ]
+  },
+  "plan_analyses": [
+    {
+      "rank": 1,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "for any past year coverage",
+        "marketing_name": "Eligibility Notice 545935",
+        "metal_level": "Platinum",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 2,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "for any\npast year coverage",
+        "marketing_name": "Eligibility Notice 545935",
+        "metal_level": "Platinum",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 3,
+      "plan": {
+        "plan_id": "080124",
+        "issuer": "Ambetter",
+        "marketing_name": "Gold AMB HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 4,
+      "plan": {
+        "plan_id": "180106",
+        "issuer": "Ambetter",
+        "marketing_name": "Gold AMB HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 5,
+      "plan": {
+        "plan_id": "060016",
+        "issuer": "UnitedHealthcare",
+        "marketing_name": "Gold UHC HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 6,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "Blue Cross",
+        "marketing_name": "Plan Overview Page1",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 7,
+      "plan": {
+        "plan_id": "080044",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver CSR AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 8,
+      "plan": {
+        "plan_id": "0040015",
+        "issuer": "Banner Health",
+        "marketing_name": "Silver CSR Banner",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 9,
+      "plan": {
+        "plan_id": "0040027",
+        "issuer": "Banner Health",
+        "marketing_name": "Silver CSR Banner",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 10,
+      "plan": {
+        "plan_id": "420154",
+        "issuer": "Blue Cross Blue Shield",
+        "marketing_name": "Silver CSR BCBS",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 11,
+      "plan": {
+        "plan_id": "420167",
+        "issuer": "Blue Cross Blue Shield",
+        "marketing_name": "Silver CSR BCBS",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 12,
+      "plan": {
+        "plan_id": "080123",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver Standard AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 13,
+      "plan": {
+        "plan_id": "180105",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver Standard AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 14,
+      "plan": {
+        "plan_id": "010002",
+        "issuer": "Imperial Health",
+        "marketing_name": "Silver Standard Imperial",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 15,
+      "plan": {
+        "plan_id": "070052",
+        "issuer": "Oscar Health",
+        "marketing_name": "Silver Standard Oscar",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 16,
+      "plan": {
+        "plan_id": "060018",
+        "issuer": "UnitedHealthcare",
+        "marketing_name": "Silver Standard UHC",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 10,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.85
+      },
+      "estimated_annual_cost": 0.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 17,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "Blue Cross",
+        "marketing_name": "Plan Overview Page1",
+        "metal_level": "Gold",
+        "monthly_premium": 19.27,
+        "deductible": 20.0,
+        "oop_max": 0.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 9.74251392990286,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.8
+      },
+      "estimated_annual_cost": 231.24,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 18,
+      "plan": {
+        "plan_id": "420167",
+        "issuer": "Blue Cross Blue Shield",
+        "marketing_name": "Silver CSR BCBS",
+        "metal_level": "Silver",
+        "monthly_premium": 0.0,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.65949571747351,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.18
+      },
+      "estimated_annual_cost": 3000.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 19,
+      "plan": {
+        "plan_id": "080123",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver Standard AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 19.27,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.402009647376369,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.13
+      },
+      "estimated_annual_cost": 3231.24,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 20,
+      "plan": {
+        "plan_id": "010002",
+        "issuer": "Imperial Health",
+        "marketing_name": "Silver Standard Imperial",
+        "metal_level": "Silver",
+        "monthly_premium": 28.19,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.282820454575822,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.11
+      },
+      "estimated_annual_cost": 3338.28,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 21,
+      "plan": {
+        "plan_id": "070052",
+        "issuer": "Oscar Health",
+        "marketing_name": "Silver Standard Oscar",
+        "metal_level": "Silver",
+        "monthly_premium": 30.75,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.248613690722752,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.1
+      },
+      "estimated_annual_cost": 3369.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 22,
+      "plan": {
+        "plan_id": "060018",
+        "issuer": "UnitedHealthcare",
+        "marketing_name": "Silver Standard UHC",
+        "metal_level": "Silver",
+        "monthly_premium": 29.84,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.260773126311148,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.1
+      },
+      "estimated_annual_cost": 3358.08,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 23,
+      "plan": {
+        "plan_id": "180105",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver Standard AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 34.17,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.202915592137789,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.09
+      },
+      "estimated_annual_cost": 3410.04,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 24,
+      "plan": {
+        "plan_id": "0040015",
+        "issuer": "Banner Health",
+        "marketing_name": "Silver CSR Banner",
+        "metal_level": "Silver",
+        "monthly_premium": 47.71,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.021993880196154,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.05
+      },
+      "estimated_annual_cost": 3572.52,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 25,
+      "plan": {
+        "plan_id": "420154",
+        "issuer": "Blue Cross Blue Shield",
+        "marketing_name": "Silver CSR BCBS",
+        "metal_level": "Silver",
+        "monthly_premium": 53.51,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 5.944494180841541,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.04
+      },
+      "estimated_annual_cost": 3642.12,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 26,
+      "plan": {
+        "plan_id": "0040027",
+        "issuer": "Banner Health",
+        "marketing_name": "Silver CSR Banner",
+        "metal_level": "Silver",
+        "monthly_premium": 69.55,
+        "deductible": 500.0,
+        "oop_max": 3000.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 5.73016742607464,
+        "financial_protection": 10.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 4.0
+      },
+      "estimated_annual_cost": 3834.6,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 27,
+      "plan": {
+        "plan_id": "080044",
+        "issuer": "Ambetter",
+        "marketing_name": "Silver CSR AMB",
+        "metal_level": "Silver",
+        "monthly_premium": 24.21,
+        "deductible": 0.0,
+        "oop_max": 3050.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 6.280326211378203,
+        "financial_protection": 7.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 3.81
+      },
+      "estimated_annual_cost": 3340.52,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 28,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "Ambetter",
+        "marketing_name": "Plan Overview Page2",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 30.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 1.3146888654311257,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 2.11
+      },
+      "estimated_annual_cost": 7800.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 29,
+      "plan": {
+        "plan_id": "545935",
+        "issuer": "Ambetter",
+        "marketing_name": "Plan Overview Page2",
+        "metal_level": "Gold",
+        "monthly_premium": 0.0,
+        "deductible": 0.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 1.3146888654311257,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 2.11
+      },
+      "estimated_annual_cost": 7800.0,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 30,
+      "plan": {
+        "plan_id": "53901AZ1420167",
+        "issuer": "Blue Cross",
+        "marketing_name": "Binder1",
+        "metal_level": "Platinum",
+        "monthly_premium": 60.63,
+        "deductible": 1500.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 0.504549766832802,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 1.95
+      },
+      "estimated_annual_cost": 8527.56,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 31,
+      "plan": {
+        "plan_id": "080124",
+        "issuer": "Ambetter",
+        "marketing_name": "Gold AMB HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 60.63,
+        "deductible": 1500.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 0.504549766832802,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 1.95
+      },
+      "estimated_annual_cost": 8527.56,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 32,
+      "plan": {
+        "plan_id": "180106",
+        "issuer": "Ambetter",
+        "marketing_name": "Gold AMB HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 77.2,
+        "deductible": 1500.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 0.28314114298694604,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 1.91
+      },
+      "estimated_annual_cost": 8726.4,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    },
+    {
+      "rank": 33,
+      "plan": {
+        "plan_id": "060016",
+        "issuer": "UnitedHealthcare",
+        "marketing_name": "Gold UHC HMO",
+        "metal_level": "Gold",
+        "monthly_premium": 98.39,
+        "deductible": 1500.0,
+        "oop_max": 7800.0
+      },
+      "scores": {
+        "provider_network": 0.0,
+        "medication_coverage": 2.0,
+        "total_cost": 0,
+        "financial_protection": 0.0,
+        "administrative_simplicity": 10.0,
+        "plan_quality": 7.0,
+        "overall_weighted": 1.85
+      },
+      "estimated_annual_cost": 8980.68,
+      "provider_coverage": {
+        "Dr. Sarah Martinez": false,
+        "Dr. James Wilson": false,
+        "Dr. Emily Chen": false
+      },
+      "medication_coverage": {
+        "Metformin": "NOT",
+        "Lisinopril": "NOT"
+      }
+    }
+  ]
+}

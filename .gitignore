@@ -44,14 +44,24 @@ env/
 *~
 .DS_Store
 
-# Reports and Output
-reports/
+# Generated Reports (but keep templates)
+reports/*.csv
+reports/*.html
+reports/*.json
+reports/*.md
+!reports/templates/
+!reports/README.md
+
+# Output directories
 output/
-*.csv
-*.html
-*.json
-!sample_client.json
+
+# Keep important config files
+!examples/sample_client.json
 !requirements.txt
+!requirements-dev.txt
+
+# Archive directory (development artifacts)
+archive/
 
 # Jupyter Notebooks
 .ipynb_checkpoints

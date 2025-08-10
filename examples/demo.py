@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add the project to the Python path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from healthplan_navigator.core.ingest import DocumentParser
 from healthplan_navigator.core.models import Client, PersonalInfo, MedicalProfile, Priorities, Provider, Medication, Priority
@@ -94,7 +94,7 @@ def main():
     # Parse documents
     print("\nParsing healthcare plan documents...")
     parser = DocumentParser()
-    documents_dir = Path(__file__).parent / "personal_documents"
+    documents_dir = Path(__file__).parent.parent / "personal_documents"
     
     # Parse all PDF and DOCX files in the personal_documents directory
     plans = parser.parse_batch(str(documents_dir))

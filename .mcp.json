@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "docling": {
+      "command": "uvx",
+      "args": ["--from=docling-mcp", "docling-mcp-server", "--transport", "stdio"],
+      "env": {}
+    },
+    "pymupdf4llm": {
+      "command": "uvx",
+      "args": ["pymupdf4llm-mcp@latest", "stdio"],
+      "env": {}
+    },
+    "chroma": {
+      "command": "uvx",
+      "args": ["chroma-mcp", "--client-type", "persistent", "--data-dir", "./healthcare_vectors"],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Insurance Match - Find Your Perfect Healthcare Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --text: #334155;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-warm: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-cool: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.03"><polygon points="30 30 0 0 60 0"/></g></g></svg>');
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+            position: relative;
+            animation: fadeInScale 0.8s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        
+        .form-content {
+            padding: 40px;
+        }
+        
+        .question-block {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .question-block:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .question-block:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 1.2em;
+            box-shadow: var(--shadow-md);
+            animation: bounceIn 0.5s ease;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .question-title {
+            font-size: 1.5em;
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.01em;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95em;
+            letter-spacing: 0.01em;
+        }
+        
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group input[type="email"],
+        .input-group input[type="tel"],
+        .input-group input[type="date"],
+        .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+            font-weight: 500;
+        }
+        
+        .input-group input:hover,
+        .input-group select:hover {
+            border-color: var(--primary);
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.02), rgba(168, 85, 247, 0.02));
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkbox-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .checkbox-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .checkbox-item input[type="checkbox"]:checked + label {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .checkbox-item input[type="checkbox"]:checked ~ .checkbox-item::after {
+            opacity: 0.05;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        .checkbox-item label {
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .medication-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .medication-grid input {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95em;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .medication-grid input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .priority-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .priority-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 18px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .priority-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--gradient);
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+        
+        .priority-item:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .priority-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .priority-item input[type="radio"] {
+            margin-right: 14px;
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary);
+        }
+        
+        .priority-item label {
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+            border-radius: 12px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, var(--success), var(--warning), var(--danger));
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+        
+        .help-text {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 4px solid var(--warning);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.95em;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .help-text::before {
+            content: "💡";
+            margin-right: 12px;
+            font-size: 1.3em;
+        }
+        
+        .warning-text {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-left: 4px solid var(--danger);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.95em;
+            font-weight: 600;
+            animation: slideIn 0.4s ease;
+        }
+        
+        .warning-text::before {
+            content: "⚠️";
+            margin-right: 12px;
+            font-size: 1.3em;
+        }
+        
+        .info-text {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border-left: 4px solid var(--info);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.95em;
+            animation: slideIn 0.4s ease;
+        }
+        
+        .info-text::before {
+            content: "ℹ️";
+            margin-right: 12px;
+            font-size: 1.3em;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .button-group button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button-group button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .button-group button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            color: var(--text);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .btn-add:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-remove {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .btn-remove:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .specialist-entry {
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .usage-counter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        
+        .usage-counter:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .usage-counter label {
+            font-weight: 600;
+            color: var(--text);
+            min-width: 180px;
+        }
+        
+        .usage-counter input[type="number"] {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .usage-counter span {
+            color: var(--text-light);
+            font-size: 0.95em;
+            font-style: italic;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow-xl);
+            transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .modal h2 {
+            color: var(--dark);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        
+        .modal textarea {
+            width: 100%;
+            height: 200px;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9em;
+            margin: 20px 0;
+            resize: vertical;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+        
+        .privacy-notice {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 2px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .privacy-notice h4 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .privacy-notice ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .privacy-notice li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: var(--text);
+        }
+        
+        .privacy-notice li::before {
+            content: "🔒";
+            position: absolute;
+            left: 0;
+        }
+        
+        .supply-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .supply-btn {
+            padding: 6px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .supply-btn:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+        }
+        
+        .supply-btn.active {
+            background: var(--gradient);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .notification, .modal {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            .priority-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+    
+    <!-- Notification Element -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- Modal for Submission -->
+    <div id="submitModal" class="modal">
+        <div class="modal-content">
+            <h2>📊 Analysis Ready</h2>
+            <p style="margin-bottom: 20px; color: var(--text-light);">Your personalized insurance analysis is complete. Choose how to proceed:</p>
+            
+            <div style="background: linear-gradient(135deg, #f0f9ff, #dbeafe); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: #1e40af; margin-bottom: 12px;">Option 1: Email Analysis</h3>
+                <p style="margin-bottom: 12px; color: var(--text);">Send to: <strong>analysis@insurancecompany.com</strong></p>
+                <textarea id="formDataText" readonly></textarea>
+                <button onclick="copyToClipboard()" class="btn-primary" style="width: 100%;">📋 Copy to Clipboard</button>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: #15803d; margin-bottom: 12px;">Option 2: Download Report</h3>
+                <p style="margin-bottom: 12px; color: var(--text);">Save for your records or future reference</p>
+                <button onclick="downloadFormData()" class="btn-secondary" style="width: 100%;">💾 Download Report</button>
+            </div>
+            
+            <button onclick="closeModal()" class="btn-danger" style="width: 100%; margin-top: 15px;">Close</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Smart Insurance Match</h1>
+            <p>Personalized Healthcare Coverage Analysis in Under 5 Minutes</p>
+        </div>
+        
+        <div class="form-content">
+            <!-- Question 1: Core Demographics & Location -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">1</span>
+                    Core Demographics
+                </h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="zipCode">ZIP Code *</label>
+                        <input type="text" id="zipCode" placeholder="85001" maxlength="5" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="age">Your Age *</label>
+                        <input type="number" id="age" placeholder="45" min="0" max="120" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="householdSize">Household Size *</label>
+                        <input type="number" id="householdSize" placeholder="2" min="1" max="10" required>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="income">Annual Household Income *</label>
+                        <input type="text" id="income" placeholder="$75,000" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="incomeChange">Income Stability</label>
+                        <select id="incomeChange">
+                            <option value="">Select...</option>
+                            <option value="stable">Stable</option>
+                            <option value="increasing">Likely to increase</option>
+                            <option value="decreasing">Likely to decrease</option>
+                            <option value="variable">Variable/Seasonal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 2: Risk Profile & Financial Readiness -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">2</span>
+                    Risk Tolerance & Financial Planning
+                </h3>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Risk Preference</span>
+                        <span id="riskValue">Balanced</span>
+                    </div>
+                    <input type="range" min="1" max="5" value="3" class="slider" id="riskTolerance" oninput="updateRiskLabel(this.value)">
+                    <div class="slider-labels">
+                        <span>📊 Predictable Costs</span>
+                        <span>⚖️ Balanced</span>
+                        <span>💰 Lower Premiums</span>
+                    </div>
+                </div>
+                <p style="margin-top: 10px; color: var(--text-light); font-size: 0.9em;">
+                    Left: Higher monthly payments but fewer surprises | Right: Lower monthly costs but higher risk
+                </p>
+                
+                <div class="input-row" style="margin-top: 25px;">
+                    <div class="input-group">
+                        <label for="taxBracket">Federal Tax Bracket</label>
+                        <select id="taxBracket">
+                            <option value="">Select...</option>
+                            <option value="10">10%</option>
+                            <option value="12">12%</option>
+                            <option value="22">22%</option>
+                            <option value="24">24%</option>
+                            <option value="32">32%</option>
+                            <option value="35">35%</option>
+                            <option value="37">37%</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="hsaContribution">Planned HSA Contribution (Annual)</label>
+                        <input type="text" id="hsaContribution" placeholder="$3,000 or None">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <label style="font-weight: 600; color: var(--text); display: block; margin-bottom: 12px;">
+                        Emergency Medical Fund Available
+                    </label>
+                    <div class="priority-options">
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-1000">
+                            <label for="fund-1000">$1,000</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-2500">
+                            <label for="fund-2500">$2,500</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-5000">
+                            <label for="fund-5000">$5,000</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-7500">
+                            <label for="fund-7500">$7,500</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-10000">
+                            <label for="fund-10000">$10,000</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="emergency-fund" id="fund-15000">
+                            <label for="fund-15000">$15,000+</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 3: Subsidy & Marketplace Status -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">3</span>
+                    Marketplace Subsidy Status
+                </h3>
+                <div class="info-text">
+                    Quick check at Healthcare.gov can save hundreds monthly - takes just 10 minutes
+                </div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="not-checked">
+                        <label for="not-checked">Haven't checked yet</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="not-sure">
+                        <label for="not-sure">Need help calculating</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="no-subsidy">
+                        <label for="no-subsidy">No subsidy qualified</label>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="subsidyAmount">Monthly Subsidy Approved</label>
+                        <input type="text" id="subsidyAmount" placeholder="$250 or None">
+                    </div>
+                    <div class="input-group">
+                        <label for="csrLevel">Cost-Sharing Reduction</label>
+                        <select id="csrLevel">
+                            <option value="">Unknown/None</option>
+                            <option value="silver73">Silver 73%</option>
+                            <option value="silver87">Silver 87%</option>
+                            <option value="silver94">Silver 94%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 4: Health Conditions -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">4</span>
+                    Current Health Status
+                </h3>
+                <p style="margin-bottom: 15px; color: var(--text-light);">Select all that apply:</p>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="diabetes">
+                        <label for="diabetes">Diabetes</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="heart">
+                        <label for="heart">Heart/Cardiovascular</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cancer">
+                        <label for="cancer">Cancer (active/remission)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="mental">
+                        <label for="mental">Mental Health Conditions</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="autoimmune">
+                        <label for="autoimmune">Autoimmune Disorders</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="respiratory">
+                        <label for="respiratory">Respiratory Issues</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="chronic-pain">
+                        <label for="chronic-pain">Chronic Pain</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="kidney">
+                        <label for="kidney">Kidney/Liver Disease</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="dialysis">
+                        <label for="dialysis">Dialysis/Infusion Therapy</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="bp">
+                        <label for="bp">Hypertension/High Cholesterol</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="none-conditions">
+                        <label for="none-conditions">None of the above</label>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-top: 20px;">
+                    <label for="otherCondition">Other Significant Conditions</label>
+                    <input type="text" id="otherCondition" placeholder="Please specify...">
+                </div>
+            </div>
+            
+            <!-- Question 5: Medications with Supply Details -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">5</span>
+                    Current Medications
+                </h3>
+                <div class="help-text">
+                    Include all prescription medications for accurate formulary matching
+                </div>
+                <div id="medicationsList">
+                    <div class="medication-entry" style="padding: 15px; background: white; border-radius: 8px; margin-bottom: 15px;">
+                        <div class="input-row">
+                            <div class="input-group" style="flex: 2;">
+                                <label>Medication Name</label>
+                                <input type="text" class="med-name" placeholder="e.g., Metformin">
+                            </div>
+                            <div class="input-group">
+                                <label>Supply per Fill</label>
+                                <div class="supply-options">
+                                    <button type="button" class="supply-btn" onclick="selectSupply(this, 30)">30</button>
+                                    <button type="button" class="supply-btn" onclick="selectSupply(this, 60)">60</button>
+                                    <button type="button" class="supply-btn" onclick="selectSupply(this, 90)">90</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addMedication()" class="btn-add">
+                    <span>+</span> Add Medication
+                </button>
+                
+                <div class="checkbox-group" style="margin-top: 25px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="mail-order-required">
+                        <label for="mail-order-required">Some require mail-order delivery</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="specialty-drugs">
+                        <label for="specialty-drugs">Include specialty/injectable drugs</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="generics-ok">
+                        <label for="generics-ok">Generic substitutions acceptable</label>
+                    </div>
+                </div>
+                
+                <div class="input-row" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label for="monthlyRxCost">Current Monthly Medication Cost</label>
+                        <input type="text" id="monthlyRxCost" placeholder="$150">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 6: Healthcare Team -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">6</span>
+                    Your Medical Team
+                </h3>
+                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Primary Care Provider</h4>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="pcpName">Provider Name</label>
+                            <input type="text" id="pcpName" placeholder="Dr. Jane Smith">
+                        </div>
+                        <div class="input-group">
+                            <label for="pcpPractice">Practice/Health System</label>
+                            <input type="text" id="pcpPractice" placeholder="Desert Medical Group">
+                        </div>
+                        <div class="input-group">
+                            <label for="pcpNPI">NPI# (Optional)</label>
+                            <input type="text" id="pcpNPI" placeholder="1234567890">
+                        </div>
+                    </div>
+                    <div class="priority-options" style="grid-template-columns: repeat(3, 1fr); margin-top: 15px;">
+                        <div class="priority-item">
+                            <input type="radio" name="pcp-pref" id="pcp-must">
+                            <label for="pcp-must">Must keep</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="pcp-pref" id="pcp-preferred">
+                            <label for="pcp-preferred">Preferred</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="pcp-pref" id="pcp-flexible">
+                            <label for="pcp-flexible">Flexible</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Specialists</h4>
+                    <div id="specialistsList">
+                        <div class="specialist-entry" data-specialist="1">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="spec1Name">Specialist Name</label>
+                                    <input type="text" id="spec1Name" placeholder="Dr. Robert Jones">
+                                </div>
+                                <div class="input-group">
+                                    <label for="spec1Type">Specialty</label>
+                                    <input type="text" id="spec1Type" placeholder="Endocrinologist">
+                                </div>
+                                <div class="input-group">
+                                    <label for="spec1NPI">NPI# (Optional)</label>
+                                    <input type="text" id="spec1NPI" placeholder="1234567890">
+                                </div>
+                            </div>
+                            <div class="priority-options" style="grid-template-columns: repeat(3, 1fr); margin-top: 15px; margin-bottom: 20px;">
+                                <div class="priority-item">
+                                    <input type="radio" name="spec1-pref" id="spec1-must">
+                                    <label for="spec1-must">Must keep</label>
+                                </div>
+                                <div class="priority-item">
+                                    <input type="radio" name="spec1-pref" id="spec1-preferred">
+                                    <label for="spec1-preferred">Preferred</label>
+                                </div>
+                                <div class="priority-item">
+                                    <input type="radio" name="spec1-pref" id="spec1-flexible">
+                                    <label for="spec1-flexible">Flexible</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addSpecialist()" class="btn-add" id="addSpecBtn">
+                        <span>+</span> Add Specialist
+                    </button>
+                    <button type="button" onclick="removeLastSpecialist()" id="removeSpecBtn" class="btn-remove" style="display: none; margin-left: 10px;">
+                        <span>−</span> Remove
+                    </button>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="preferredHospital">Preferred Hospital</label>
+                        <input type="text" id="preferredHospital" placeholder="Banner University Medical Center">
+                    </div>
+                    <div class="input-group">
+                        <label for="hospitalPref">Hospital Priority</label>
+                        <select id="hospitalPref">
+                            <option value="">Select...</option>
+                            <option value="must">Must use this hospital</option>
+                            <option value="preferred">Strongly preferred</option>
+                            <option value="any">Any network hospital</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 7: Detailed Utilization - Enhanced -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">7</span>
+                    Healthcare Utilization Details
+                </h3>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Last 12 months & expected next year:</p>
+                
+                <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05)); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Office Visits</h4>
+                    <div class="usage-counter">
+                        <label>Primary Care Visits:</label>
+                        <input type="number" id="pcpVisits" min="0" max="50" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Specialist Visits:</label>
+                        <input type="number" id="specialistVisits" min="0" max="100" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Urgent Care Visits:</label>
+                        <input type="number" id="urgentCareVisits" min="0" max="20" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(34, 197, 94, 0.05)); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Therapy & Rehabilitation</h4>
+                    <div class="usage-counter">
+                        <label>Physical Therapy:</label>
+                        <input type="number" id="ptVisits" min="0" max="100" placeholder="0">
+                        <span>sessions/year</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Mental Health Therapy:</label>
+                        <select id="mentalHealthFreq" style="width: 150px; padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px;">
+                            <option value="none">None</option>
+                            <option value="adhoc">As needed</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Chiropractic Care:</label>
+                        <input type="number" id="chiroVisits" min="0" max="100" placeholder="0">
+                        <span>visits/year</span>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.05)); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Emergency & Hospital</h4>
+                    <div class="usage-counter">
+                        <label>ER Visits:</label>
+                        <input type="number" id="erVisits" min="0" max="20" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Hospital Stays:</label>
+                        <input type="number" id="hospitalStays" min="0" max="50" placeholder="0">
+                        <span>nights total</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Surgeries/Procedures:</label>
+                        <input type="number" id="surgeries" min="0" max="20" placeholder="0">
+                        <span>scheduled</span>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.05)); padding: 20px; border-radius: 12px;">
+                    <h4 style="color: var(--text); margin-bottom: 15px;">Diagnostics & Preventive</h4>
+                    <div class="usage-counter">
+                        <label>Lab Work/Blood Tests:</label>
+                        <input type="number" id="labWork" min="0" max="50" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                    <div class="usage-counter">
+                        <label>Imaging (X-ray/CT/MRI):</label>
+                        <input type="number" id="imaging" min="0" max="20" placeholder="0">
+                        <span>times/year</span>
+                    </div>
+                    <div class="checkbox-group" style="margin-top: 15px;">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vision-exam">
+                            <label for="vision-exam">Annual eye exam needed</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hearing-exam">
+                            <label for="hearing-exam">Hearing services needed</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 8: Expected Major Events -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">8</span>
+                    Upcoming Healthcare Needs
+                </h3>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Expected in the next 12 months:</p>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="surgery-planned">
+                        <label for="surgery-planned">Surgery scheduled/likely</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pregnancy">
+                        <label for="pregnancy">Pregnancy/fertility treatment</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="expensive-med">
+                        <label for="expensive-med">Starting expensive medication</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="dental-work">
+                        <label for="dental-work">Major dental procedures</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="joint-replacement">
+                        <label for="joint-replacement">Joint replacement</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cancer-treatment">
+                        <label for="cancer-treatment">Cancer treatment</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="weight-loss-surgery">
+                        <label for="weight-loss-surgery">Bariatric surgery</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="no-major-events">
+                        <label for="no-major-events">No major procedures expected</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 9: Network & Travel Preferences -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">9</span>
+                    Network & Accessibility
+                </h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="maxDistance">Maximum Distance to Provider</label>
+                        <select id="maxDistance">
+                            <option value="">Select...</option>
+                            <option value="5">Within 5 miles</option>
+                            <option value="10">Within 10 miles</option>
+                            <option value="20">Within 20 miles</option>
+                            <option value="30">Within 30 miles</option>
+                            <option value="50">Within 50 miles</option>
+                            <option value="any">Distance not a factor</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="outOfStateFreq">Out-of-State Care Frequency</label>
+                        <select id="outOfStateFreq">
+                            <option value="">Select...</option>
+                            <option value="never">Never</option>
+                            <option value="rarely">Rarely (emergencies only)</option>
+                            <option value="occasionally">Occasionally (few times/year)</option>
+                            <option value="frequently">Frequently (monthly+)</option>
+                            <option value="snowbird">Snowbird (seasonal)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group" style="margin-top: 20px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="travel-frequent">
+                        <label for="travel-frequent">Frequent traveler (need national network)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="college-student">
+                        <label for="college-student">College student (multi-state coverage)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="international-travel">
+                        <label for="international-travel">International travel (need coverage abroad)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="telehealth-preferred">
+                        <label for="telehealth-preferred">Prefer telehealth when possible</label>
+                    </div>
+                </div>
+                
+                <div class="input-row" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label for="intlTravelDays">Days Abroad Annually</label>
+                        <input type="number" id="intlTravelDays" placeholder="0" min="0" max="365">
+                    </div>
+                    <div class="input-group">
+                        <label for="otherStates">Other States Needing Coverage</label>
+                        <input type="text" id="otherStates" placeholder="e.g., CA, TX">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 10: Family Coverage -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">10</span>
+                    Family Coverage Requirements
+                </h3>
+                <div class="priority-options">
+                    <div class="priority-item">
+                        <input type="radio" name="coverage-for" id="just-me">
+                        <label for="just-me">Individual</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="coverage-for" id="me-spouse">
+                        <label for="me-spouse">Self + Spouse/Partner</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="coverage-for" id="me-children">
+                        <label for="me-children">Self + Children</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="coverage-for" id="whole-family">
+                        <label for="whole-family">Family</label>
+                    </div>
+                </div>
+                <div class="input-row" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label for="spouseAge">Spouse/Partner Age</label>
+                        <input type="number" id="spouseAge" placeholder="If applicable" min="0" max="120">
+                    </div>
+                    <div class="input-group">
+                        <label for="childrenAges">Children Ages</label>
+                        <input type="text" id="childrenAges" placeholder="e.g., 8, 12, 16">
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 20px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="special-needs-children">
+                        <label for="special-needs-children">Children with special healthcare needs</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="others-conditions">
+                        <label for="others-conditions">Family members with chronic conditions</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="others-medications">
+                        <label for="others-medications">Family members on regular medications</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 11: Budget & Priorities -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">11</span>
+                    Budget & Priorities
+                </h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="maxPremium">Maximum Monthly Premium *</label>
+                        <input type="text" id="maxPremium" placeholder="$600" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="hsaFsa">Current HSA/FSA Balance</label>
+                        <input type="text" id="hsaFsa" placeholder="$1,200 or None">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <label style="font-weight: 600; color: var(--text); display: block; margin-bottom: 12px;">
+                        Top Priority (Choose ONE)
+                    </label>
+                    <div class="priority-options">
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="lowest-payment">
+                            <label for="lowest-payment">Lowest monthly premium</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="keep-doctors">
+                            <label for="keep-doctors">Keep current providers</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="medication-coverage">
+                            <label for="medication-coverage">Best drug coverage</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="lowest-deductible">
+                            <label for="lowest-deductible">Lowest deductible</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="simplest">
+                            <label for="simplest">Simplest to use</label>
+                        </div>
+                        <div class="priority-item">
+                            <input type="radio" name="priority" id="comprehensive">
+                            <label for="comprehensive">Most comprehensive</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 12: Plan Type Preference -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">12</span>
+                    Plan Type Understanding
+                </h3>
+                <div class="priority-options">
+                    <div class="priority-item">
+                        <input type="radio" name="plan-type" id="hmo">
+                        <label for="hmo"><strong>HMO</strong> - Lower cost, referrals required</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="plan-type" id="ppo">
+                        <label for="ppo"><strong>PPO</strong> - Flexibility, higher cost</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="plan-type" id="epo">
+                        <label for="epo"><strong>EPO</strong> - No referrals, network only</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="plan-type" id="hdhp">
+                        <label for="hdhp"><strong>HDHP+HSA</strong> - Tax benefits, high deductible</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="plan-type" id="dont-know">
+                        <label for="dont-know"><strong>Unsure</strong> - Recommend best fit</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 13: Special Circumstances -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">13</span>
+                    Special Considerations
+                </h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="substance-abuse">
+                        <label for="substance-abuse">Substance abuse treatment</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="mail-order-pharmacy">
+                        <label for="mail-order-pharmacy">Specialty pharmacy needs</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="durable-medical">
+                        <label for="durable-medical">Durable medical equipment</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="alternative-medicine">
+                        <label for="alternative-medicine">Alternative medicine interest</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="transgender-care">
+                        <label for="transgender-care">Gender-affirming care</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tobacco-user">
+                        <label for="tobacco-user">Tobacco/nicotine use</label>
+                    </div>
+                </div>
+                
+                <div class="warning-text" style="margin-top: 20px;">
+                    Tobacco use may increase premiums by up to 50%
+                </div>
+            </div>
+            
+            <!-- Question 14: Pharmacy Preferences -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">14</span>
+                    Pharmacy Network
+                </h3>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-cvs">
+                        <label for="pharmacy-cvs">CVS</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-walgreens">
+                        <label for="pharmacy-walgreens">Walgreens</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-walmart">
+                        <label for="pharmacy-walmart">Walmart</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-costco">
+                        <label for="pharmacy-costco">Costco</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-local">
+                        <label for="pharmacy-local">Local independent</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-mail">
+                        <label for="pharmacy-mail">Mail order preferred</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pharmacy-any">
+                        <label for="pharmacy-any">No preference</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 15: Coverage Timeline -->
+            <div class="question-block">
+                <h3 class="question-title">
+                    <span class="question-number">15</span>
+                    Coverage Timeline
+                </h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="coverageUrgency">Coverage Situation</label>
+                        <select id="coverageUrgency">
+                            <option value="">Select...</option>
+                            <option value="uninsured">Currently uninsured</option>
+                            <option value="losing">Losing coverage soon</option>
+                            <option value="shopping">Shopping for better plan</option>
+                            <option value="qualifying">Qualifying life event</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="startDate">Desired Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                </div>
+                
+                <div class="input-row" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label for="currentCarrier">Current Insurance (if any)</label>
+                        <input type="text" id="currentCarrier" placeholder="e.g., Blue Cross Blue Shield">
+                    </div>
+                    <div class="input-group">
+                        <label for="qualityRatings">Plan Quality Importance</label>
+                        <select id="qualityRatings">
+                            <option value="">Select...</option>
+                            <option value="very">Very important (4+ stars only)</option>
+                            <option value="somewhat">Somewhat important</option>
+                            <option value="not">Not a factor</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <label style="font-weight: 600; color: var(--text); display: block; margin-bottom: 12px;">
+                        Other Coverage Eligibility
+                    </label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="medicare-eligible">
+                            <label for="medicare-eligible">Medicare</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="medicaid-eligible">
+                            <label for="medicaid-eligible">Medicaid</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="va-eligible">
+                            <label for="va-eligible">VA Benefits</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="employer-eligible">
+                            <label for="employer-eligible">Employer Coverage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cobra-eligible">
+                            <label for="cobra-eligible">COBRA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="no-other-coverage">
+                            <label for="no-other-coverage">None apply</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact & Submit Section -->
+            <div class="question-block" style="background: linear-gradient(135deg, #f0f9ff, #dbeafe); border: 2px solid var(--info);">
+                <h3 style="color: #1e40af; margin-bottom: 25px; font-size: 1.6em;">📊 Final Step: Contact & Analysis</h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" placeholder="John">
+                    </div>
+                    <div class="input-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" placeholder="Smith">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="john.smith@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="(555) 123-4567">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="bestTime">Best Contact Time</label>
+                        <select id="bestTime">
+                            <option value="morning">Morning (8am-12pm)</option>
+                            <option value="afternoon">Afternoon (12pm-5pm)</option>
+                            <option value="evening">Evening (5pm-8pm)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="contactMethod">Preferred Method</label>
+                        <select id="contactMethod">
+                            <option value="email">Email</option>
+                            <option value="phone">Phone Call</option>
+                            <option value="text">Text Message</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="info-text" style="margin-top: 25px;">
+                    Your data stays local until you choose to submit. We analyze 50+ plans to find your best matches.
+                </div>
+                
+                <div class="button-group" style="justify-content: center; margin-top: 35px;">
+                    <button class="btn-secondary" onclick="saveProgress()">💾 Save Progress</button>
+                    <button class="btn-primary" onclick="submitForm()">🚀 Generate Analysis</button>
+                    <button class="btn-danger" onclick="clearForm()">🗑️ Clear All</button>
+                </div>
+                
+                <p style="text-align: center; margin-top: 25px; color: var(--text-light); font-size: 0.95em;">
+                    <strong>Auto-saved:</strong> <span id="lastSaved">Not yet</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>✨ What Happens Next?</h3>
+            <p style="color: var(--text-light); margin: 20px 0; font-size: 1.1em;">
+                Our AI-powered engine analyzes your profile against all available plans to find your optimal matches
+            </p>
+            
+            <div class="privacy-notice">
+                <h4>🔒 Privacy & Security</h4>
+                <ul>
+                    <li>Local storage until submission</li>
+                    <li>HIPAA compliant processing</li>
+                    <li>Zero data sharing policy</li>
+                    <li>Encrypted transmission</li>
+                </ul>
+            </div>
+            
+            <p style="color: var(--text-light); margin-top: 35px; font-size: 0.95em;">
+                © 2024 Smart Insurance Match | Licensed Insurance Advisors | Privacy Policy
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Progress tracking
+        let currentProgress = 0;
+        let specialistCount = 1;
+        let medicationCount = 1;
+        const MAX_SPECIALISTS = 10;
+        const MAX_MEDICATIONS = 20;
+        
+        // Update progress bar
+        function updateProgress() {
+            const totalFields = document.querySelectorAll('input[required], select[required]').length;
+            const filledFields = Array.from(document.querySelectorAll('input[required], select[required]')).filter(field => field.value).length;
+            const progress = Math.round((filledFields / totalFields) * 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        // Update risk label
+        function updateRiskLabel(value) {
+            const labels = ['Very Conservative', 'Conservative', 'Balanced', 'Aggressive', 'Very Aggressive'];
+            document.getElementById('riskValue').textContent = labels[value - 1];
+        }
+        
+        // Supply selection
+        function selectSupply(btn, days) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.supply-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            btn.setAttribute('data-supply', days);
+        }
+        
+        // Add Medication
+        function addMedication() {
+            if (medicationCount >= MAX_MEDICATIONS) {
+                showNotification(`Maximum of ${MAX_MEDICATIONS} medications reached`, 'error');
+                return;
+            }
+            
+            medicationCount++;
+            const medicationsList = document.getElementById('medicationsList');
+            
+            const newMedication = document.createElement('div');
+            newMedication.className = 'medication-entry';
+            newMedication.style.cssText = 'padding: 15px; background: white; border-radius: 8px; margin-bottom: 15px; animation: slideDown 0.4s ease;';
+            
+            newMedication.innerHTML = `
+                <div class="input-row">
+                    <div class="input-group" style="flex: 2;">
+                        <label>Medication #${medicationCount}</label>
+                        <input type="text" class="med-name" placeholder="Medication name">
+                    </div>
+                    <div class="input-group">
+                        <label>Supply per Fill</label>
+                        <div class="supply-options">
+                            <button type="button" class="supply-btn" onclick="selectSupply(this, 30)">30</button>
+                            <button type="button" class="supply-btn" onclick="selectSupply(this, 60)">60</button>
+                            <button type="button" class="supply-btn" onclick="selectSupply(this, 90)">90</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            medicationsList.appendChild(newMedication);
+            newMedication.querySelector('.med-name').focus();
+        }
+        
+        // Add Specialist
+        function addSpecialist() {
+            if (specialistCount >= MAX_SPECIALISTS) {
+                showNotification(`Maximum of ${MAX_SPECIALISTS} specialists reached`, 'error');
+                return;
+            }
+            
+            specialistCount++;
+            const specialistsList = document.getElementById('specialistsList');
+            
+            const newSpecialist = document.createElement('div');
+            newSpecialist.className = 'specialist-entry';
+            newSpecialist.setAttribute('data-specialist', specialistCount);
+            newSpecialist.style.marginTop = '25px';
+            newSpecialist.style.paddingTop = '25px';
+            newSpecialist.style.borderTop = '2px solid var(--border)';
+            
+            newSpecialist.innerHTML = `
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="spec${specialistCount}Name">Specialist #${specialistCount}</label>
+                        <input type="text" id="spec${specialistCount}Name" placeholder="Doctor name">
+                    </div>
+                    <div class="input-group">
+                        <label for="spec${specialistCount}Type">Specialty</label>
+                        <input type="text" id="spec${specialistCount}Type" placeholder="Specialty type">
+                    </div>
+                    <div class="input-group">
+                        <label for="spec${specialistCount}NPI">NPI# (Optional)</label>
+                        <input type="text" id="spec${specialistCount}NPI" placeholder="1234567890">
+                    </div>
+                </div>
+                <div class="priority-options" style="grid-template-columns: repeat(3, 1fr); margin-top: 15px; margin-bottom: 20px;">
+                    <div class="priority-item">
+                        <input type="radio" name="spec${specialistCount}-pref" id="spec${specialistCount}-must">
+                        <label for="spec${specialistCount}-must">Must keep</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="spec${specialistCount}-pref" id="spec${specialistCount}-preferred">
+                        <label for="spec${specialistCount}-preferred">Preferred</label>
+                    </div>
+                    <div class="priority-item">
+                        <input type="radio" name="spec${specialistCount}-pref" id="spec${specialistCount}-flexible">
+                        <label for="spec${specialistCount}-flexible">Flexible</label>
+                    </div>
+                </div>
+            `;
+            
+            specialistsList.appendChild(newSpecialist);
+            
+            if (specialistCount > 1) {
+                document.getElementById('removeSpecBtn').style.display = 'inline-flex';
+            }
+            
+            document.getElementById(`spec${specialistCount}Name`).focus();
+        }
+        
+        // Remove Last Specialist
+        function removeLastSpecialist() {
+            if (specialistCount > 1) {
+                const specialistsList = document.getElementById('specialistsList');
+                const lastSpecialist = specialistsList.querySelector(`[data-specialist="${specialistCount}"]`);
+                if (lastSpecialist) {
+                    lastSpecialist.remove();
+                    specialistCount--;
+                }
+                
+                if (specialistCount <= 1) {
+                    document.getElementById('removeSpecBtn').style.display = 'none';
+                }
+            }
+        }
+        
+        // Save Progress
+        function saveProgress() {
+            const formData = {
+                textInputs: {},
+                checkboxes: {},
+                radioButtons: {},
+                selectInputs: {},
+                specialistCount: specialistCount,
+                medicationCount: medicationCount,
+                savedDate: new Date().toLocaleString()
+            };
+            
+            // Save all inputs
+            document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"]').forEach(input => {
+                if (input.id) {
+                    formData.textInputs[input.id] = input.value;
+                }
+            });
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.id) {
+                    formData.checkboxes[checkbox.id] = checkbox.checked;
+                }
+            });
+            
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                if (radio.name && radio.checked) {
+                    formData.radioButtons[radio.name] = radio.id;
+                }
+            });
+            
+            document.querySelectorAll('select').forEach(select => {
+                if (select.id) {
+                    formData.selectInputs[select.id] = select.value;
+                }
+            });
+            
+            // Save medication supply selections
+            document.querySelectorAll('.supply-btn.active').forEach((btn, index) => {
+                formData.textInputs[`medSupply${index}`] = btn.getAttribute('data-supply');
+            });
+            
+            localStorage.setItem('healthcareFormData', JSON.stringify(formData));
+            document.getElementById('lastSaved').textContent = formData.savedDate;
+            showNotification('✅ Progress saved!', 'success');
+        }
+        
+        // Load Saved Data
+        function loadSavedData() {
+            const savedData = localStorage.getItem('healthcareFormData');
+            
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                
+                // Restore counts and create elements
+                if (formData.specialistCount) {
+                    for (let i = 1; i < formData.specialistCount; i++) {
+                        addSpecialist();
+                    }
+                }
+                
+                if (formData.medicationCount) {
+                    for (let i = 1; i < formData.medicationCount; i++) {
+                        addMedication();
+                    }
+                }
+                
+                // Restore all values
+                if (formData.textInputs) {
+                    Object.keys(formData.textInputs).forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.value = formData.textInputs[id];
+                        }
+                    });
+                }
+                
+                if (formData.checkboxes) {
+                    Object.keys(formData.checkboxes).forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.checked = formData.checkboxes[id];
+                        }
+                    });
+                }
+                
+                if (formData.radioButtons) {
+                    Object.keys(formData.radioButtons).forEach(name => {
+                        const element = document.getElementById(formData.radioButtons[name]);
+                        if (element) {
+                            element.checked = true;
+                        }
+                    });
+                }
+                
+                if (formData.selectInputs) {
+                    Object.keys(formData.selectInputs).forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.value = formData.selectInputs[id];
+                        }
+                    });
+                }
+                
+                if (formData.savedDate) {
+                    document.getElementById('lastSaved').textContent = formData.savedDate;
+                }
+                
+                updateProgress();
+                showNotification('📂 Previous data loaded', 'info');
+            }
+        }
+        
+        // Submit Form
+        function submitForm() {
+            const formData = collectFormData();
+            const emailText = formatFormDataForEmail(formData);
+            document.getElementById('formDataText').value = emailText;
+            document.getElementById('submitModal').classList.add('show');
+        }
+        
+        // Collect Form Data
+        function collectFormData() {
+            const data = {
+                submissionDate: new Date().toLocaleString(),
+                demographics: {},
+                health: {},
+                utilization: {},
+                medications: [],
+                providers: {},
+                preferences: {},
+                contact: {}
+            };
+            
+            // Collect all form data with proper categorization
+            // Demographics
+            data.demographics.zipCode = document.getElementById('zipCode')?.value;
+            data.demographics.age = document.getElementById('age')?.value;
+            data.demographics.householdSize = document.getElementById('householdSize')?.value;
+            data.demographics.income = document.getElementById('income')?.value;
+            data.demographics.taxBracket = document.getElementById('taxBracket')?.value;
+            
+            // Risk Profile
+            data.preferences.riskTolerance = document.getElementById('riskTolerance')?.value;
+            data.preferences.hsaContribution = document.getElementById('hsaContribution')?.value;
+            
+            // Utilization
+            data.utilization.pcpVisits = document.getElementById('pcpVisits')?.value;
+            data.utilization.specialistVisits = document.getElementById('specialistVisits')?.value;
+            data.utilization.urgentCareVisits = document.getElementById('urgentCareVisits')?.value;
+            data.utilization.mentalHealthFreq = document.getElementById('mentalHealthFreq')?.value;
+            data.utilization.ptVisits = document.getElementById('ptVisits')?.value;
+            data.utilization.chiroVisits = document.getElementById('chiroVisits')?.value;
+            
+            // Medications
+            document.querySelectorAll('.medication-entry').forEach(entry => {
+                const medName = entry.querySelector('.med-name')?.value;
+                const supplyBtn = entry.querySelector('.supply-btn.active');
+                if (medName) {
+                    data.medications.push({
+                        name: medName,
+                        supply: supplyBtn ? supplyBtn.getAttribute('data-supply') : '30'
+                    });
+                }
+            });
+            
+            // Contact
+            data.contact.firstName = document.getElementById('firstName')?.value;
+            data.contact.lastName = document.getElementById('lastName')?.value;
+            data.contact.email = document.getElementById('email')?.value;
+            data.contact.phone = document.getElementById('phone')?.value;
+            
+            return data;
+        }
+        
+        // Format Data for Email
+        function formatFormDataForEmail(data) {
+            let text = "SMART INSURANCE MATCH - ANALYSIS REQUEST\n";
+            text += "=" .repeat(50) + "\n\n";
+            text += "Submitted: " + data.submissionDate + "\n\n";
+            
+            text += "DEMOGRAPHICS\n";
+            text += "-" .repeat(30) + "\n";
+            text += JSON.stringify(data.demographics, null, 2) + "\n\n";
+            
+            text += "HEALTH UTILIZATION\n";
+            text += "-" .repeat(30) + "\n";
+            text += JSON.stringify(data.utilization, null, 2) + "\n\n";
+            
+            text += "MEDICATIONS\n";
+            text += "-" .repeat(30) + "\n";
+            data.medications.forEach((med, i) => {
+                text += `${i + 1}. ${med.name} (${med.supply}-day supply)\n`;
+            });
+            text += "\n";
+            
+            text += "PREFERENCES\n";
+            text += "-" .repeat(30) + "\n";
+            text += JSON.stringify(data.preferences, null, 2) + "\n\n";
+            
+            text += "CONTACT\n";
+            text += "-" .repeat(30) + "\n";
+            text += JSON.stringify(data.contact, null, 2) + "\n\n";
+            
+            text += "=" .repeat(50) + "\n";
+            text += "END OF SUBMISSION\n";
+            
+            return text;
+        }
+        
+        // Copy to Clipboard
+        function copyToClipboard() {
+            const textarea = document.getElementById('formDataText');
+            textarea.select();
+            document.execCommand('copy');
+            showNotification('📋 Copied to clipboard!', 'success');
+        }
+        
+        // Download Form Data
+        function downloadFormData() {
+            const formData = collectFormData();
+            const text = formatFormDataForEmail(formData);
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'insurance_analysis_' + Date.now() + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('💾 Report downloaded!', 'success');
+        }
+        
+        // Clear Form
+        function clearForm() {
+            if (confirm('Clear all data? This cannot be undone.')) {
+                document.querySelectorAll('input, select, textarea').forEach(field => {
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = false;
+                    } else {
+                        field.value = '';
+                    }
+                });
+                
+                // Reset to single specialist and medication
+                while (specialistCount > 1) {
+                    removeLastSpecialist();
+                }
+                
+                // Clear extra medications
+                const medicationsList = document.getElementById('medicationsList');
+                while (medicationsList.children.length > 1) {
+                    medicationsList.removeChild(medicationsList.lastChild);
+                    medicationCount--;
+                }
+                
+                localStorage.removeItem('healthcareFormData');
+                document.getElementById('lastSaved').textContent = 'Not yet';
+                document.getElementById('progressBar').style.width = '0%';
+                
+                showNotification('🗑️ Form cleared', 'info');
+            }
+        }
+        
+        // Close Modal
+        function closeModal() {
+            document.getElementById('submitModal').classList.remove('show');
+        }
+        
+        // Show Notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type + ' show';
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize
+        window.addEventListener('load', function() {
+            loadSavedData();
+            updateProgress();
+            
+            // Add progress tracking to all inputs
+            document.querySelectorAll('input, select').forEach(field => {
+                field.addEventListener('change', updateProgress);
+                field.addEventListener('input', updateProgress);
+            });
+        });
+        
+        // Auto-save every 60 seconds
+        setInterval(() => {
+            if (!document.querySelector('input:focus, select:focus, textarea:focus')) {
+                saveProgress();
+            }
+        }, 60000);
+    </script>
+</body>
+</html>

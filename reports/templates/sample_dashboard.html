@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPlan Navigator - Analysis Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric-card { display: inline-block; width: 150px; text-align: center; margin: 10px; padding: 15px; background: #e8f4fd; border-radius: 8px; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #2196F3; }
+        .metric-label { font-size: 12px; color: #666; }
+        .recommendation { background: #e8f5e8; border-left: 4px solid #4CAF50; padding: 15px; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        .score-high { color: #4CAF50; font-weight: bold; }
+        .score-medium { color: #FF9800; font-weight: bold; }
+        .score-low { color: #f44336; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 HealthPlan Navigator Analysis</h1>
+            <p><strong>Client:</strong> Ryan Healthcare Research | 
+               <strong>Generated:</strong> 2025-08-07 22:53 |
+               <strong>Plans Analyzed:</strong> 33</p>
+        </div>
+        
+        
+        <div class="card recommendation">
+            <h2>🥇 Top Recommendation: Eligibility Notice 545935</h2>
+            <div class="metric-card">
+                <div class="metric-value">4.8/10</div>
+                <div class="metric-label">Overall Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">$0</div>
+                <div class="metric-label">Monthly Premium</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">$0</div>
+                <div class="metric-label">Est. Annual Cost</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">Platinum</div>
+                <div class="metric-label">Metal Level</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">for any past year coverage</div>
+                <div class="metric-label">Issuer</div>
+            </div>
+        </div>
+        
+        
+        <div class="card">
+            <h2>📊 Score Comparison</h2>
+            <div id="scoreChart" style="height: 400px;"></div>
+        </div>
+        
+        <div class="card">
+            <h2>💰 Cost Analysis</h2>
+            <div id="costChart" style="height: 400px;"></div>
+        </div>
+        
+        <div class="card">
+            <h2>📋 Detailed Scoring Matrix</h2>
+            
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Plan Name</th>
+                    <th>Overall Score</th>
+                    <th>Provider Network</th>
+                    <th>Medication Coverage</th>
+                    <th>Total Cost</th>
+                    <th>Financial Protection</th>
+                    <th>Administrative</th>
+                    <th>Plan Quality</th>
+                    <th>Est. Annual Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+                <tr>
+                    <td>1</td>
+                    <td><strong>Eligibility Notice 545935</strong><br><small>for any past year coverage</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>2</td>
+                    <td><strong>Eligibility Notice 545935</strong><br><small>for any
+past year coverage</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>3</td>
+                    <td><strong>Gold AMB HMO</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td><strong>Gold AMB HMO</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td><strong>Gold UHC HMO</strong><br><small>UnitedHealthcare</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td><strong>Plan Overview Page1</strong><br><small>Blue Cross</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>7</td>
+                    <td><strong>Silver CSR AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>8</td>
+                    <td><strong>Silver CSR Banner</strong><br><small>Banner Health</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>9</td>
+                    <td><strong>Silver CSR Banner</strong><br><small>Banner Health</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>10</td>
+                    <td><strong>Silver CSR BCBS</strong><br><small>Blue Cross Blue Shield</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>11</td>
+                    <td><strong>Silver CSR BCBS</strong><br><small>Blue Cross Blue Shield</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>12</td>
+                    <td><strong>Silver Standard AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>13</td>
+                    <td><strong>Silver Standard AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>14</td>
+                    <td><strong>Silver Standard Imperial</strong><br><small>Imperial Health</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>15</td>
+                    <td><strong>Silver Standard Oscar</strong><br><small>Oscar Health</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>16</td>
+                    <td><strong>Silver Standard UHC</strong><br><small>UnitedHealthcare</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$0</td>
+                </tr>
+            
+                <tr>
+                    <td>17</td>
+                    <td><strong>Plan Overview Page1</strong><br><small>Blue Cross</small></td>
+                    <td class="score-medium">4.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-high">9.7/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$231</td>
+                </tr>
+            
+                <tr>
+                    <td>18</td>
+                    <td><strong>Silver CSR BCBS</strong><br><small>Blue Cross Blue Shield</small></td>
+                    <td class="score-medium">4.2/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.7/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,000</td>
+                </tr>
+            
+                <tr>
+                    <td>19</td>
+                    <td><strong>Silver Standard AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.4/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,231</td>
+                </tr>
+            
+                <tr>
+                    <td>20</td>
+                    <td><strong>Silver Standard Imperial</strong><br><small>Imperial Health</small></td>
+                    <td class="score-medium">4.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.3/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,338</td>
+                </tr>
+            
+                <tr>
+                    <td>21</td>
+                    <td><strong>Silver Standard Oscar</strong><br><small>Oscar Health</small></td>
+                    <td class="score-medium">4.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.2/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,369</td>
+                </tr>
+            
+                <tr>
+                    <td>22</td>
+                    <td><strong>Silver Standard UHC</strong><br><small>UnitedHealthcare</small></td>
+                    <td class="score-medium">4.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.3/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,358</td>
+                </tr>
+            
+                <tr>
+                    <td>23</td>
+                    <td><strong>Silver Standard AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-medium">4.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.2/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,410</td>
+                </tr>
+            
+                <tr>
+                    <td>24</td>
+                    <td><strong>Silver CSR Banner</strong><br><small>Banner Health</small></td>
+                    <td class="score-medium">4.0/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,573</td>
+                </tr>
+            
+                <tr>
+                    <td>25</td>
+                    <td><strong>Silver CSR BCBS</strong><br><small>Blue Cross Blue Shield</small></td>
+                    <td class="score-medium">4.0/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">5.9/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,642</td>
+                </tr>
+            
+                <tr>
+                    <td>26</td>
+                    <td><strong>Silver CSR Banner</strong><br><small>Banner Health</small></td>
+                    <td class="score-medium">4.0/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">5.7/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,835</td>
+                </tr>
+            
+                <tr>
+                    <td>27</td>
+                    <td><strong>Silver CSR AMB</strong><br><small>Ambetter</small></td>
+                    <td class="score-low">3.8/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-medium">6.3/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$3,341</td>
+                </tr>
+            
+                <tr>
+                    <td>28</td>
+                    <td><strong>Plan Overview Page2</strong><br><small>Ambetter</small></td>
+                    <td class="score-low">2.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">1.3/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$7,800</td>
+                </tr>
+            
+                <tr>
+                    <td>29</td>
+                    <td><strong>Plan Overview Page2</strong><br><small>Ambetter</small></td>
+                    <td class="score-low">2.1/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">1.3/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$7,800</td>
+                </tr>
+            
+                <tr>
+                    <td>30</td>
+                    <td><strong>Binder1</strong><br><small>Blue Cross</small></td>
+                    <td class="score-low">1.9/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">0.5/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$8,528</td>
+                </tr>
+            
+                <tr>
+                    <td>31</td>
+                    <td><strong>Gold AMB HMO</strong><br><small>Ambetter</small></td>
+                    <td class="score-low">1.9/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">0.5/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$8,528</td>
+                </tr>
+            
+                <tr>
+                    <td>32</td>
+                    <td><strong>Gold AMB HMO</strong><br><small>Ambetter</small></td>
+                    <td class="score-low">1.9/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">0.3/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$8,726</td>
+                </tr>
+            
+                <tr>
+                    <td>33</td>
+                    <td><strong>Gold UHC HMO</strong><br><small>UnitedHealthcare</small></td>
+                    <td class="score-low">1.9/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">2.0/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-low">0.0/10</td>
+                    <td class="score-high">10.0/10</td>
+                    <td class="score-high">7.0/10</td>
+                    <td>$8,981</td>
+                </tr>
+            </tbody></table>
+        </div>
+    </div>
+    
+    <script>
+        
+        // Score comparison chart
+        var scoreData = [{
+            x: ['Eligibility Notice 5...', 'Eligibility Notice 5...', 'Gold AMB HMO', 'Gold AMB HMO', 'Gold UHC HMO', 'Plan Overview Page1', 'Silver CSR AMB', 'Silver CSR Banner', 'Silver CSR Banner', 'Silver CSR BCBS'],
+            y: [4.85, 4.85, 4.85, 4.85, 4.85, 4.85, 4.85, 4.85, 4.85, 4.85],
+            type: 'bar',
+            name: 'Overall Score',
+            marker: {color: '#2196F3'}
+        }];
+        
+        var scoreLayout = {
+            title: 'Plan Scores (0-10 Scale)',
+            xaxis: {title: 'Plans', tickangle: -45},
+            yaxis: {title: 'Score', range: [0, 10]},
+            margin: {b: 100}
+        };
+        
+        Plotly.newPlot('scoreChart', scoreData, scoreLayout);
+        
+        // Cost comparison chart
+        var costData = [{
+            x: ['Eligibility Notice 5...', 'Eligibility Notice 5...', 'Gold AMB HMO', 'Gold AMB HMO', 'Gold UHC HMO', 'Plan Overview Page1', 'Silver CSR AMB', 'Silver CSR Banner', 'Silver CSR Banner', 'Silver CSR BCBS'],
+            y: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            type: 'bar',
+            name: 'Estimated Annual Cost',
+            marker: {color: '#4CAF50'}
+        }, {
+            x: ['Eligibility Notice 5...', 'Eligibility Notice 5...', 'Gold AMB HMO', 'Gold AMB HMO', 'Gold UHC HMO', 'Plan Overview Page1', 'Silver CSR AMB', 'Silver CSR Banner', 'Silver CSR Banner', 'Silver CSR BCBS'],
+            y: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            type: 'bar',
+            name: 'Annual Premiums Only',
+            marker: {color: '#FF9800'}
+        }];
+        
+        var costLayout = {
+            title: 'Cost Comparison',
+            xaxis: {title: 'Plans', tickangle: -45},
+            yaxis: {title: 'Cost ($)'},
+            margin: {b: 100},
+            barmode: 'group'
+        };
+        
+        Plotly.newPlot('costChart', costData, costLayout);
+        
+    </script>
+</body>
+</html>

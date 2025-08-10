@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(true)",
+      "Bash(python:*)",
+      "Bash(copy healthplan_navigatoroutputreport.py healthplan_navigatoroutputreport_backup.py)",
+      "Bash(cp:*)",
+      "Bash(git commit:*)",
+      "Bash(pip install:*)",
+      "Bash(rm:*)",
+      "WebFetch(domain:github.com)"
+    ],
+    "deny": []
+  }
+}

@@ -5,14 +5,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="healthplan-navigator",
-    version="1.0.0",
+    version="1.1.2",
     author="Ryan Zimmerman",
     author_email="rzimmerman2022@example.com",
     description="AI-powered healthcare plan analysis system with 6-metric scoring",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rzimmerman2022/healthplan-navigator",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Healthcare Industry",
@@ -38,6 +39,7 @@ setup(
     entry_points={
         "console_scripts": [
             "healthplan-navigator=healthplan_navigator.cli:main",
+            "healthplan-demo=healthplan_navigator.analyzer:demo_main",
         ],
     },
     include_package_data=True,
