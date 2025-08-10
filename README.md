@@ -282,7 +282,7 @@ claude mcp add --scope project chroma uvx -- chroma-mcp --client-type persistent
 - [**API Documentation**](./docs/API.md) - Detailed API reference
 - [**System Architecture**](./docs/ARCHITECTURE.md) - Technical deep dive
 - [**Examples**](./examples/) - Working usage examples  
-- [**Changelog**](./CHANGELOG.md) - Version history
+- [**Changelog**](./docs/CHANGELOG.md) - Version history
 
 ---
 
@@ -322,7 +322,7 @@ Overall Status: GOLD_STANDARD_COMPLIANT
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for guidelines.
 
 ### Development Workflow
 1. Fork the repository

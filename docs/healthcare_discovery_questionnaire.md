@@ -1,6 +1,10 @@
 # Healthcare Plan Discovery Questionnaire
-## Comprehensive Information Gathering for Optimal Plan Selection
-### 51 Questions to Ensure Complete Analysis
+**Last Updated**: 2025-08-10  
+**Version**: 1.1.2  
+**Description**: Comprehensive information gathering for optimal plan selection
+
+## Overview
+This questionnaire collects 51 key data points to ensure complete healthcare plan analysis with statistical rigor.
 
 ---
 

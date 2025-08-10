@@ -1,6 +1,17 @@
 # API Documentation
+**Last Updated**: 2025-08-10  
+**Version**: 1.1.2  
+**Description**: Comprehensive API reference for HealthPlan Navigator
 
 > **HealthPlan Navigator v1.1.2** - Gold Standard Healthcare Analytics API
+
+## Table of Contents
+1. [Overview](#overview)
+2. [Quick Start](#quick-start)
+3. [Core Classes](#core-classes)
+4. [Analysis Methods](#analysis-methods)
+5. [Statistical Features](#statistical-features)
+6. [Examples](#examples)
 
 ## Overview
 

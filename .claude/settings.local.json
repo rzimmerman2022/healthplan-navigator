@@ -14,8 +14,14 @@
       "Bash(git commit:*)",
       "Bash(pip install:*)",
       "Bash(rm:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "docling",
+    "pymupdf4llm",
+    "chroma"
+  ]
 }

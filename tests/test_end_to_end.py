@@ -9,14 +9,17 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-from healthplan_navigator.core.models import (
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.healthplan_navigator.core.models import (
     Client, PersonalInfo, MedicalProfile, Priorities,
     Provider, Medication, Priority, Plan, MetalLevel, PlanType
 )
-from healthplan_navigator.core.ingest import DocumentParser
-from healthplan_navigator.analysis.engine import AnalysisEngine
-from healthplan_navigator.output.report import ReportGenerator
-from healthplan_navigator.analyzer import HealthPlanAnalyzer
+from src.healthplan_navigator.core.ingest import DocumentParser
+from src.healthplan_navigator.analysis.engine import AnalysisEngine
+from src.healthplan_navigator.output.report import ReportGenerator
+from src.healthplan_navigator.analyzer import HealthPlanAnalyzer
 
 
 class TestEndToEndPipeline(unittest.TestCase):

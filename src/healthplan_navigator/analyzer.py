@@ -1,17 +1,34 @@
 #!/usr/bin/env python3
 """
 HealthPlanAnalyzer - Unified orchestrator for healthcare plan analysis.
-Provides a single interface for the complete analysis pipeline.
 
-Version: 1.1.0
-Last Updated: 2025-08-06
+This module provides the main entry point for the HealthPlan Navigator system.
+It orchestrates all components to deliver gold standard healthcare analytics
+with statistical rigor and mathematical certainty.
+
+Version: 1.1.2
+Last Updated: 2025-08-10
 
 Core Capabilities:
-- Multi-format document parsing (PDF, DOCX, JSON, CSV)
-- Live API integration with Healthcare.gov, NPPES, RxNorm
-- 6-metric scoring system with weighted analysis
-- Multi-format report generation
-- Intelligent caching and fallback mechanisms
+- Multi-format document parsing (PDF, DOCX, JSON, CSV) with robust error handling
+- Live API integration with Healthcare.gov marketplace, NPPES provider registry, RxNorm medication database
+- 6-metric scoring system with weighted analysis and confidence intervals
+- Statistical validation with Monte Carlo simulations and hypothesis testing
+- Multi-format report generation (Markdown, CSV, JSON, HTML) with professional formatting
+- Intelligent caching and fallback mechanisms for reliability and performance
+
+Entry Point Usage:
+    from src.healthplan_navigator.analyzer import HealthPlanAnalyzer
+    
+    analyzer = HealthPlanAnalyzer(confidence_level=0.95)
+    report = analyzer.analyze(client, enable_statistics=True)
+
+Statistical Features (Gold Standard Compliance):
+- 95% confidence intervals on all scores and cost projections
+- Monte Carlo simulations (10,000+ iterations) for cost modeling
+- Hypothesis testing with p-values for plan comparisons
+- Power analysis for sample size validation
+- Sensitivity analysis on scoring weights
 """
 
 from pathlib import Path

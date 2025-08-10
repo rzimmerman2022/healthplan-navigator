@@ -11,11 +11,11 @@ from pathlib import Path
 from datetime import datetime
 
 # Add project to path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from healthplan_navigator.analytics.statistical_validator import HealthcareStatisticalValidator
-from healthplan_navigator.core.models import Plan, MetalLevel, PlanType
-from healthplan_navigator.core.score import HealthPlanScorer
+from src.healthplan_navigator.analytics.statistical_validator import HealthcareStatisticalValidator
+from src.healthplan_navigator.core.models import Plan, MetalLevel, PlanType
+from src.healthplan_navigator.core.score import HealthPlanScorer
 
 
 def test_statistical_rigor():
