@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="healthplan-navigator",
-    version="1.1.2",
+    version="1.1.3",
     author="Ryan Zimmerman",
     author_email="rzimmerman2022@example.com",
     description="AI-powered healthcare plan analysis system with 6-metric scoring",

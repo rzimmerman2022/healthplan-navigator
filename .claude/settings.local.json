@@ -16,7 +16,9 @@
       "Bash(rm:*)",
       "WebFetch(domain:github.com)",
       "Bash(git checkout:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(findstr:*)",
+      "mcp__pymupdf4llm__convert_pdf_to_markdown"
     ],
     "deny": []
   },
