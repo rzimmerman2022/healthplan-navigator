@@ -192,34 +192,22 @@ class DocumentParser:
     
     def _extract_issuer_fixed(self, text: str, source_file: str) -> str:
         """Extract issuer with improved patterns."""
-        # Clean text first
-        clean_text = text[:1000]  # Check first 1000 chars
-        
-        # Look for known issuers in text - more specific patterns
+        # Look for known issuers in text
         issuer_patterns = [
-            r'(Ambetter from Arizona Complete Health)',
-            r'(Ambetter)',
-            r'(Blue Cross Blue Shield of Arizona)',
-            r'(Blue Cross Blue Shield)',
-            r'(UnitedHealthcare)',
-            r'(UnitedHealth)',
+            r'(Ambetter(?:\s+from\s+[^\.]+)?)',
+            r'(Blue Cross Blue Shield(?:\s+of\s+[^\.]+)?)',
+            r'(UnitedHealth(?:care)?)',
             r'(Banner Health)',
             r'(Oscar Health)',
             r'(Aetna)',
             r'(Cigna)',
             r'(Humana)',
-            r'(Imperial)',
         ]
         
         for pattern in issuer_patterns:
-            match = re.search(pattern, clean_text, re.IGNORECASE)
+            match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                issuer = match.group(1).strip()
-                # Clean up any trailing garbage
-                issuer = issuer.split('\n')[0]
-                issuer = issuer.split('Quick')[0].strip()
-                issuer = issuer.split('Standard')[0].strip()
-                return issuer
+                return match.group(1).strip()
         
         # Fallback to filename
         return self._extract_issuer_from_filename(source_file)

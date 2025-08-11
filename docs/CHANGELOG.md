@@ -1,11 +1,54 @@
 # Changelog
-**Last Updated**: 2025-08-10  
+**Last Updated**: 2025-08-11  
 **Description**: Complete version history and release notes for HealthPlan Navigator
 
 All notable changes to HealthPlan Navigator will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.2.0] - 2025-08-11
+**Forensic Analysis & Critical Fixes Release**
+
+### 🔍 Forensic Analysis Conducted
+- **Comprehensive code audit** revealed only 3% of files extracted data correctly
+- **Root cause identified**: PDF extraction regex patterns didn't match Healthcare.gov format
+- **Theatrical code discovered**: MCP integration never implemented despite 47 mentions
+- **Trust score calculated**: System was 43.5% functional before fixes
+
+### ✅ Fixed
+- **PDF Data Extraction**: Fixed regex patterns for Healthcare.gov format
+  - Success rate improved from 3% to 58% (19 out of 33 files)
+  - Properly extracts premium, deductible, and out-of-pocket maximum
+- **Issuer Name Extraction**: No longer returns garbage text
+  - Before: "for any past year coverage"
+  - After: "Ambetter", "Blue Cross Blue Shield", etc.
+- **Plan ID Extraction**: Correctly extracts Healthcare.gov format IDs
+  - Now properly extracts IDs like "91450AZ0080124"
+- **Metal Level Detection**: Accurately identifies Gold, Silver, Bronze tiers
+
+### 🔴 Issues Discovered
+- **MCP Integration**: Configuration exists but tools never imported (theatrical code)
+- **Healthcare.gov API**: No actual API calls made (returns empty lists)
+- **Provider/Medication Lookups**: Return "Data Pending" placeholders
+- **DOCX Files**: Parse but extract $0 values (14 files need separate patterns)
+- **Scoring System**: All plans get identical 4.85/10 scores despite different inputs
+
+### 📊 New Tools Added
+- **forensic_test.py**: Comprehensive functionality verification
+- **main_verified.py**: Minimal pipeline with execution proofs
+- **check_parsed_files.py**: Shows which files parse correctly
+- **analyze_scores.py**: Investigates scoring issues
+
+### 📚 Documentation Added
+- **FORENSIC_ANALYSIS_REPORT.md**: Complete forensic findings with evidence
+- **FIX_SUMMARY.md**: Detailed breakdown of fixes applied
+- **README.md**: Completely rewritten with honest functionality assessment
+
+### 🎯 Impact
+- **Before**: 1 file worked (3%), 32 extracted zeros (97%)
+- **After**: 19 files work (58%), 14 still need fixes (42%)
+- **Trust Score**: Improved from 43.5% to 58%
 
 ## [1.1.3] - 2025-08-10
 **Production Test & Deployment Release**

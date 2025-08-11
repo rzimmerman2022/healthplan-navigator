@@ -19,8 +19,7 @@ class DocumentParser:
             'bronze': MetalLevel.BRONZE,
             'silver': MetalLevel.SILVER,
             'gold': MetalLevel.GOLD,
-            'platinum': MetalLevel.PLATINUM,
-            'catastrophic': MetalLevel.CATASTROPHIC
+            'platinum': MetalLevel.PLATINUM
         }
     
     def parse_document(self, file_path: str) -> Optional[Plan]:
@@ -65,9 +64,7 @@ class DocumentParser:
             with pdfplumber.open(file_path) as pdf:
                 text = ""
                 for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text += page_text
+                    text += page.extract_text() or ""
                 
                 return self._extract_plan_from_text(text, file_path)
         except Exception as e:
@@ -115,45 +112,35 @@ class DocumentParser:
             return []
     
     def _extract_plan_from_text(self, text: str, source_file: str) -> Optional[Plan]:
-        """Extract plan information using FIXED regex patterns for Healthcare.gov PDFs."""
+        """Extract plan information using text parsing and regex patterns."""
         
-        # Clean text for better matching
-        text = text.replace('\n', ' ')  # Join lines for multi-line patterns
-        
-        # Extract plan ID - Healthcare.gov format
-        plan_id = self._extract_plan_id_fixed(text, source_file)
+        # Extract plan ID from filename
+        filename = Path(source_file).stem
+        plan_id = self._extract_plan_id(filename, text)
         
         # Extract issuer/company name
-        issuer = self._extract_issuer_fixed(text, source_file)
+        issuer = self._extract_issuer(filename, text)
         
         # Extract metal level
-        metal_level = self._extract_metal_level_fixed(text, source_file)
+        metal_level = self._extract_metal_level(filename, text)
         
         # Extract marketing name
-        marketing_name = self._extract_marketing_name_fixed(text, source_file)
+        marketing_name = self._extract_marketing_name(filename, text)
         
-        # Extract costs with FIXED patterns
-        monthly_premium = self._extract_premium_fixed(text)
-        deductible = self._extract_deductible_fixed(text)
-        oop_max = self._extract_oop_max_fixed(text)
+        # Extract costs
+        monthly_premium = self._extract_premium(text)
+        deductible = self._extract_deductible(text)
+        oop_max = self._extract_oop_max(text)
         
         # Extract cost sharing
-        cost_sharing = self._extract_cost_sharing_fixed(text)
+        cost_sharing = self._extract_cost_sharing(text)
         
         # Extract administrative details
         administrative = self._extract_administrative_details(text)
         
-        # Use defaults if extraction fails but we have a valid file
-        if not plan_id:
-            # Generate ID from filename
-            filename = Path(source_file).stem
-            plan_id = re.sub(r'[^A-Z0-9]', '', filename.upper())[:20]
-        
-        if not issuer:
-            issuer = self._extract_issuer_from_filename(source_file)
-        
-        if not marketing_name:
-            marketing_name = Path(source_file).stem.replace('_', ' ')
+        if not plan_id or not issuer or not metal_level:
+            logger.warning(f"Could not extract required plan details from {source_file}")
+            return None
         
         return Plan(
             plan_id=plan_id,
@@ -167,14 +154,18 @@ class DocumentParser:
             administrative=administrative
         )
     
-    def _extract_plan_id_fixed(self, text: str, source_file: str) -> str:
-        """Extract plan ID with Healthcare.gov specific patterns."""
-        # Healthcare.gov format: digits + AZ + digits
+    def _extract_plan_id(self, filename: str, text: str) -> Optional[str]:
+        """Extract plan ID from filename or text."""
+        # Try to extract from filename first
+        id_match = re.search(r'(\d{6,})', filename)
+        if id_match:
+            return id_match.group(1)
+        
+        # Try to extract from text
         patterns = [
-            r'Plan ID[:\s]+([0-9]+AZ[0-9]+)',
-            r'([0-9]{5,}AZ[0-9]{4,})',
-            r'Plan ID[:\s]+([A-Z0-9]+)',
-            r'ID#?\s*([0-9]{6,})',
+            r'Plan\s*ID[:\s]+([A-Z0-9]+)',
+            r'ID[:\s]+([A-Z0-9]{6,})',
+            r'([A-Z0-9]{10,})'
         ]
         
         for pattern in patterns:
@@ -182,187 +173,127 @@ class DocumentParser:
             if match:
                 return match.group(1)
         
-        # Fallback: extract from filename
-        filename = Path(source_file).stem
-        id_match = re.search(r'([0-9]{6,})', filename)
-        if id_match:
-            return id_match.group(1)
-        
-        return filename[:20]  # Use truncated filename as last resort
+        return filename  # Fallback to filename
     
-    def _extract_issuer_fixed(self, text: str, source_file: str) -> str:
-        """Extract issuer with improved patterns."""
-        # Clean text first
-        clean_text = text[:1000]  # Check first 1000 chars
-        
-        # Look for known issuers in text - more specific patterns
-        issuer_patterns = [
-            r'(Ambetter from Arizona Complete Health)',
-            r'(Ambetter)',
-            r'(Blue Cross Blue Shield of Arizona)',
-            r'(Blue Cross Blue Shield)',
-            r'(UnitedHealthcare)',
-            r'(UnitedHealth)',
-            r'(Banner Health)',
-            r'(Oscar Health)',
-            r'(Aetna)',
-            r'(Cigna)',
-            r'(Humana)',
-            r'(Imperial)',
-        ]
-        
-        for pattern in issuer_patterns:
-            match = re.search(pattern, clean_text, re.IGNORECASE)
-            if match:
-                issuer = match.group(1).strip()
-                # Clean up any trailing garbage
-                issuer = issuer.split('\n')[0]
-                issuer = issuer.split('Quick')[0].strip()
-                issuer = issuer.split('Standard')[0].strip()
-                return issuer
-        
-        # Fallback to filename
-        return self._extract_issuer_from_filename(source_file)
-    
-    def _extract_issuer_from_filename(self, filename: str) -> str:
-        """Extract issuer from filename."""
-        filename_lower = Path(filename).stem.lower()
-        
+    def _extract_issuer(self, filename: str, text: str) -> Optional[str]:
+        """Extract insurance company/issuer name."""
+        # Common issuer abbreviations in filenames
         issuer_mappings = {
-            'amb': 'Ambetter',
-            'bcbs': 'Blue Cross Blue Shield',
-            'uhc': 'UnitedHealthcare',
-            'banner': 'Banner Health',
-            'imperial': 'Imperial Health',
-            'oscar': 'Oscar Health'
+            'AMB': 'Ambetter',
+            'BCBS': 'Blue Cross Blue Shield',
+            'UHC': 'UnitedHealthcare',
+            'Banner': 'Banner Health',
+            'Imperial': 'Imperial Health',
+            'Oscar': 'Oscar Health'
         }
         
         for abbrev, full_name in issuer_mappings.items():
-            if abbrev in filename_lower:
+            if abbrev.lower() in filename.lower():
                 return full_name
         
-        # Special case for eligibility notices
-        if 'eligibility' in filename_lower:
-            return 'Healthcare.gov'
+        # Try to extract from text
+        patterns = [
+            r'(Ambetter|Blue Cross|UnitedHealth|Banner|Imperial|Oscar|Aetna|Cigna|Humana)',
+            r'Issuer[:\s]+([A-Za-z\s]+)',
+            r'Insurance Company[:\s]+([A-Za-z\s]+)'
+        ]
         
-        return 'Unknown Issuer'
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        
+        return "Unknown Issuer"
     
-    def _extract_metal_level_fixed(self, text: str, source_file: str) -> MetalLevel:
-        """Extract metal level with improved matching."""
+    def _extract_metal_level(self, filename: str, text: str) -> Optional[MetalLevel]:
+        """Extract metal level (Bronze, Silver, Gold, Platinum)."""
+        filename_lower = filename.lower()
         text_lower = text.lower()
-        filename_lower = Path(source_file).stem.lower()
         
-        # Check both text and filename
-        combined = text_lower + ' ' + filename_lower
-        
-        # Order matters - check from highest to lowest tier
-        for metal in ['platinum', 'gold', 'silver', 'bronze', 'catastrophic']:
-            if metal in combined:
+        for metal in ['platinum', 'gold', 'silver', 'bronze']:
+            if metal in filename_lower or metal in text_lower:
                 return self.metal_level_mapping[metal]
         
-        return MetalLevel.SILVER  # Default
+        return MetalLevel.SILVER  # Default fallback
     
-    def _extract_marketing_name_fixed(self, text: str, source_file: str) -> str:
-        """Extract marketing name with better patterns."""
-        # Try to find actual plan name in text
-        patterns = [
-            r'((?:Standard\s+)?(?:Gold|Silver|Bronze|Platinum)[^|]*?)(?:\s*\|)',
-            r'(Blue ACA[^|]+)',
-            r'Plan Name[:\s]+([^\n]+)',
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                name = match.group(1).strip()
-                # Clean up the name
-                name = re.sub(r'\s+', ' ', name)
-                if len(name) > 5 and len(name) < 100:
-                    return name
-        
-        # Fallback: build from filename
-        filename = Path(source_file).stem
+    def _extract_marketing_name(self, filename: str, text: str) -> str:
+        """Extract marketing name of the plan."""
+        # Try to extract from filename
         parts = filename.split('_')
+        if len(parts) >= 4:
+            # Format: HealthGov_2025_Metal_Issuer_Type_...
+            metal = parts[2] if len(parts) > 2 else ""
+            issuer = parts[3] if len(parts) > 3 else ""
+            plan_type = parts[4] if len(parts) > 4 else ""
+            return f"{metal} {issuer} {plan_type}".strip()
         
-        # Try to construct a reasonable name
-        if 'Gold' in filename:
-            metal = 'Gold'
-        elif 'Silver' in filename:
-            metal = 'Silver'
-        elif 'Bronze' in filename:
-            metal = 'Bronze'
-        else:
-            metal = ''
-        
-        issuer = self._extract_issuer_from_filename(source_file)
-        
-        if metal and issuer != 'Unknown Issuer':
-            return f"{metal} {issuer} Plan"
-        
-        return filename.replace('_', ' ')
-    
-    def _extract_premium_fixed(self, text: str) -> Optional[float]:
-        """Extract monthly premium with FIXED patterns matching Healthcare.gov format."""
+        # Try to extract from text
         patterns = [
-            r'Monthly premium\s*\$([0-9]+(?:\.[0-9]{2})?)',
-            r'premium\s*\$([0-9]+(?:\.[0-9]{2})?)\s*(?:/month|per month)?',
-            r'\$([0-9]+(?:\.[0-9]{2})?)\s*/month',
-            r'Was\s*\$([0-9]+(?:\.[0-9]{2})?)',  # Original premium before tax credit
+            r'Plan Name[:\s]+([A-Za-z0-9\s]+)',
+            r'Marketing Name[:\s]+([A-Za-z0-9\s]+)'
         ]
         
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                value = float(match.group(1))
-                # Return the value if it's reasonable (not zero unless explicitly stated)
-                if value > 0 or 'premium $0' in text.lower():
-                    return value
+                return match.group(1).strip()
         
-        return None
+        return filename  # Fallback to filename
     
-    def _extract_deductible_fixed(self, text: str) -> Optional[float]:
-        """Extract deductible with FIXED patterns."""
+    def _extract_premium(self, text: str) -> Optional[float]:
+        """Extract monthly premium amount."""
         patterns = [
-            r'Deductible\s*\$([0-9,]+(?:\.[0-9]{2})?)\s*Individual',
-            r'Deductible\s*\$([0-9,]+(?:\.[0-9]{2})?)',
-            r'Individual Deductible[:\s]*\$([0-9,]+(?:\.[0-9]{2})?)',
+            r'Monthly Premium[:\s]+\$?([0-9,]+\.?\d*)',
+            r'Premium[:\s]+\$?([0-9,]+\.?\d*)',
+            r'\$([0-9,]+\.?\d*)\s*per month'
         ]
         
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                # Remove commas and convert to float
-                value = float(match.group(1).replace(',', ''))
-                return value
+                return float(match.group(1).replace(',', ''))
         
         return None
     
-    def _extract_oop_max_fixed(self, text: str) -> Optional[float]:
-        """Extract out-of-pocket maximum with FIXED patterns."""
+    def _extract_deductible(self, text: str) -> Optional[float]:
+        """Extract individual deductible amount."""
         patterns = [
-            r'Out-of-pocket maximum\s*\$([0-9,]+(?:\.[0-9]{2})?)\s*Individual',
-            r'Out-of-pocket maximum\s*\$([0-9,]+(?:\.[0-9]{2})?)',
-            r'maximum\s*\$([0-9,]+(?:\.[0-9]{2})?)\s*Individual',
+            r'Individual Deductible[:\s]+\$?([0-9,]+\.?\d*)',
+            r'Deductible[:\s]+\$?([0-9,]+\.?\d*)',
+            r'Annual Deductible[:\s]+\$?([0-9,]+\.?\d*)'
         ]
         
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                # Remove commas and convert to float
-                value = float(match.group(1).replace(',', ''))
-                return value
+                return float(match.group(1).replace(',', ''))
         
         return None
     
-    def _extract_cost_sharing_fixed(self, text: str) -> CostSharing:
-        """Extract cost sharing details with improved patterns."""
+    def _extract_oop_max(self, text: str) -> Optional[float]:
+        """Extract out-of-pocket maximum."""
+        patterns = [
+            r'Out.of.Pocket Maximum[:\s]+\$?([0-9,]+\.?\d*)',
+            r'OOPM[:\s]+\$?([0-9,]+\.?\d*)',
+            r'Maximum Out.of.Pocket[:\s]+\$?([0-9,]+\.?\d*)'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                return float(match.group(1).replace(',', ''))
+        
+        return None
+    
+    def _extract_cost_sharing(self, text: str) -> CostSharing:
+        """Extract cost sharing details."""
         cost_sharing = CostSharing()
         
         # Primary care copay
         pcp_patterns = [
-            r'Primary care visit[:\s]*\$([0-9]+)',
-            r'PCP[:\s]*\$([0-9]+)',
-            r'Doctor visit[:\s]*\$([0-9]+)',
+            r'Primary Care[:\s]+\$?([0-9]+)',
+            r'PCP[:\s]+\$?([0-9]+)',
+            r'Family Doctor[:\s]+\$?([0-9]+)'
         ]
         
         for pattern in pcp_patterns:
@@ -373,8 +304,8 @@ class DocumentParser:
         
         # Specialist copay
         spec_patterns = [
-            r'Specialist visit[:\s]*\$([0-9]+)',
-            r'Specialist[:\s]*\$([0-9]+)',
+            r'Specialist[:\s]+\$?([0-9]+)',
+            r'Specialty Care[:\s]+\$?([0-9]+)'
         ]
         
         for pattern in spec_patterns:
@@ -385,9 +316,9 @@ class DocumentParser:
         
         # Emergency room copay
         er_patterns = [
-            r'Emergency room[:\s]*\$([0-9]+)',
-            r'ER visit[:\s]*\$([0-9]+)',
-            r'Emergency[:\s]*\$([0-9]+)',
+            r'Emergency Room[:\s]+\$?([0-9]+)',
+            r'ER[:\s]+\$?([0-9]+)',
+            r'Emergency[:\s]+\$?([0-9]+)'
         ]
         
         for pattern in er_patterns:

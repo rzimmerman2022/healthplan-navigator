@@ -18,7 +18,9 @@
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
       "Bash(findstr:*)",
-      "mcp__pymupdf4llm__convert_pdf_to_markdown"
+      "mcp__pymupdf4llm__convert_pdf_to_markdown",
+      "Bash(copy ingest.py ingest_original.py)",
+      "Bash(copy ingest_fixed.py ingest.py)"
     ],
     "deny": []
   },

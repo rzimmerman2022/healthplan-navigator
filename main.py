@@ -1,71 +1,132 @@
 #!/usr/bin/env python3
 """
-HealthPlan Navigator - Main Entry Point
-Gold Standard Healthcare Analytics Pipeline
-
-Interactive launcher for healthcare plan analysis with statistical rigor.
+HealthPlan Navigator - Verified Main Pipeline
+Minimal, best-practice pipeline with mandatory execution proofs.
 """
 
 import sys
-import argparse
+import time
 from pathlib import Path
-from typing import Optional
 
-# Add src to Python path for development
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+# Add src to Python path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-def show_welcome():
-    """Display welcome message and system status"""
-    print("=" * 70)
-    print("HEALTHPLAN NAVIGATOR v1.1.3")
-    print("Gold Standard Healthcare Analytics Pipeline")
-    print("=" * 70)
-    print()
-    print("+ Statistical Rigor: 95% confidence intervals")
-    print("+ AI Intelligence: Claude Code + MCP integration")
-    print("+ Mathematical Certainty: Monte Carlo simulations")
-    print("+ Zero Cost: Max plan + local processing")
-    print()
+from healthplan_navigator.core.ingest import DocumentParser
+from healthplan_navigator.core.models import Client, PersonalInfo, MedicalProfile, Priorities, Provider, Medication, Priority
+from healthplan_navigator.analysis.engine import AnalysisEngine
+from healthplan_navigator.output.report import ReportGenerator
 
-def show_menu():
-    """Display interactive menu options"""
-    print("SELECT AN OPTION:")
-    print()
-    print("1. Run Demo with Sample Data")
-    print("   - Process sample healthcare plans")
-    print("   - Generate statistical reports")
-    print("   - View confidence intervals")
-    print()
-    print("2. Analyze Your Documents")
-    print("   - Process your healthcare plan documents")
-    print("   - Generate personalized analysis")
-    print("   - Export multi-format reports")
-    print()
-    print("3. Claude Code + MCP Integration")
-    print("   - Use AI intelligence for analysis")
-    print("   - Process with local MCP servers")
-    print("   - Generate insights with uncertainty quantification")
-    print()
-    print("4. Run Statistical Validation")
-    print("   - Verify gold standard compliance")
-    print("   - Check statistical rigor")
-    print("   - Generate compliance report")
-    print()
-    print("5. Launch CLI Interface")
-    print("   - Command line tools")
-    print("   - Batch processing")
-    print("   - Advanced options")
-    print()
-    print("0. Exit")
-    print()
+#!/usr/bin/env python3
+"""
+HealthPlan Navigator - Verified Main Pipeline
+Minimal, best-practice pipeline with mandatory execution proofs.
+"""
 
-def run_demo():
-    """Run demonstration with sample data"""
-    print("\nRUNNING DEMO WITH SAMPLE DATA")
-    print("=" * 50)
-    
-    try:
+import sys
+import time
+from pathlib import Path
+
+# Add src to Python path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+from healthplan_navigator.core.ingest import DocumentParser
+from healthplan_navigator.core.models import Client, PersonalInfo, MedicalProfile, Priorities, Provider, Medication, Priority
+from healthplan_navigator.analysis.engine import AnalysisEngine
+from healthplan_navigator.output.report import ReportGenerator
+
+def create_verified_client():
+    print("ACTUALLY ENTERING: create_verified_client")
+    personal = PersonalInfo(
+        full_name="Ryan Healthcare Research",
+        dob="1990-03-15",
+        zipcode="85001",
+        household_size=1,
+        annual_income=85000,
+        csr_eligible=False
+    )
+    medical_profile = MedicalProfile(
+        providers=[
+            Provider(name="Dr. Sarah Martinez", specialty="Primary Care", priority=Priority.MUST_KEEP, visit_frequency=2),
+            Provider(name="Dr. James Wilson", specialty="Cardiology", priority=Priority.MUST_KEEP, visit_frequency=2),
+            Provider(name="Dr. Emily Chen", specialty="Dermatology", priority=Priority.NICE_TO_KEEP, visit_frequency=1)
+        ],
+        medications=[
+            Medication(name="Metformin", dosage="500mg", frequency="Daily", annual_doses=365),
+            Medication(name="Lisinopril", dosage="10mg", frequency="Daily", annual_doses=365)
+        ]
+    )
+    priorities = Priorities(
+        keep_providers=5,
+        minimize_total_cost=4,
+        predictable_costs=4,
+        avoid_prior_auth=3,
+        simple_admin=3
+    )
+    client = Client(personal=personal, medical_profile=medical_profile, priorities=priorities)
+    print("REAL INPUTS: {}".format(client))
+    return client
+
+def main():
+    print("ACTUALLY ENTERING: main")
+    start_time = time.time()
+    client = create_verified_client()
+
+    print("Parsing healthcare plan documents...")
+    parser = DocumentParser()
+    documents_dir = Path(__file__).parent / "personal_documents"
+    plans = parser.parse_batch(str(documents_dir))
+    print("ACTUALLY RETURNING: {} plans parsed".format(len(plans)))
+    if not plans:
+        print("FAILURE: No plans were parsed. Make sure you have PDF/DOCX files in the directory.")
+        return
+
+    print("Successfully parsed {} plans:".format(len(plans)))
+    for i, plan in enumerate(plans[:5], 1):
+        print("   {}. {} ({}) - ${:.2f}/month".format(i, plan.marketing_name, plan.issuer, plan.monthly_premium))
+    if len(plans) > 5:
+        print("   ... and {} more plans".format(len(plans) - 5))
+
+    print("Analyzing plans with 6-metric scoring system...")
+    engine = AnalysisEngine()
+    report = engine.analyze_plans(client, plans)
+    print("ACTUALLY RETURNING: Analysis report with {} plan analyses".format(len(report.plan_analyses)))
+
+    print("Generating reports...")
+    report_gen = ReportGenerator("./reports")
+    summary_file = Path("./reports") / "executive_summary_{}.md".format(report.generated_at.strftime('%Y%m%d_%H%M%S'))
+    summary = report_gen.generate_executive_summary(report)
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        f.write(summary)
+    print("ACTUALLY RETURNING: Executive summary written to {}".format(summary_file))
+
+    csv_file = report_gen.generate_scoring_matrix_csv(report)
+    json_file = report_gen.generate_json_export(report)
+    html_file = report_gen.generate_html_dashboard(report)
+    print("ACTUALLY RETURNING: CSV: {}, JSON: {}, HTML: {}".format(csv_file, json_file, html_file))
+
+    print("SCORING MATRIX PREVIEW:")
+    print("-" * 100)
+    print("{:<4} {:<30} {:<8} {:<8} {:<10} {:<6} {:<12}".format('Rank', 'Plan Name', 'Score', 'Provider', 'Medication', 'Cost', 'Annual Cost'))
+    print("-" * 100)
+    for i, analysis in enumerate(report.plan_analyses[:10], 1):
+        name = analysis.plan.marketing_name[:28] + ".." if len(analysis.plan.marketing_name) > 30 else analysis.plan.marketing_name
+        print("{:<4} {:<30} {:>6.1f}/10 {:>6.1f}/10 {:>8.1f}/10 {:>4.1f}/10 ${:>10,.0f}".format(
+            i, name, analysis.metrics.weighted_total_score, analysis.metrics.provider_network_score,
+            analysis.metrics.medication_coverage_score, analysis.metrics.total_cost_score,
+            analysis.estimated_annual_cost))
+    print("-" * 100)
+
+    print("RECOMMENDATION: Choose {}".format(report.top_recommendations[0].plan.marketing_name))
+    print("   This plan scored {:.1f}/10 overall".format(report.top_recommendations[0].metrics.weighted_total_score))
+    print("   Best balance of provider access, medication coverage, and cost")
+
+    print("Demo complete! Check the './reports' directory for detailed analysis files.")
+    end_time = time.time()
+    print("TOTAL EXECUTION TIME: {:.2f} seconds".format(end_time - start_time))
+
+if __name__ == "__main__":
+    main()
+
         # Import here to avoid import errors if dependencies missing
         from examples.demo import main as demo_main
         
